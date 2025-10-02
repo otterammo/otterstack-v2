@@ -1,0 +1,23 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+      - "8920:8920" # HTTPS
+      - "7359:7359/udp" # Auto-discovery
+      - "1900:1900/udp" # DLNA
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ../data/movies:/media/movies:ro
+      - ../data/tv:/media/tv:ro
+      - ../data/music:/media/music:ro
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+      - JELLYFIN_PublishedServerUrl=http://jellyfin.local
+    networks:
+      - media-network

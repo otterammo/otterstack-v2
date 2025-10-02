@@ -1,0 +1,9 @@
+include:
+  - jellyfin/docker-compose.yml
+  - jellyseerr/docker-compose.yml
+  - servarr/docker-compose.yml
+  - qbittorrent/docker-compose.yaml
+
+networks:
+  media-network:
+    driver: bridge

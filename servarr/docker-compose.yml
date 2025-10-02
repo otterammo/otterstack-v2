@@ -1,0 +1,66 @@
+services:
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    volumes:
+      - ./sonarr/config:/config
+      - ../data/tv:/tv
+      - ../data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    networks:
+      - media-network
+
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    volumes:
+      - ./radarr/config:/config
+      - ../data/movies:/movies
+      - ../data/downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    networks:
+      - media-network
+
+  prowlarr:
+    image: linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    volumes:
+      - ./prowlarr/config:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    networks:
+      - media-network
+
+  bazarr:
+    image: linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    ports:
+      - "6767:6767"
+    volumes:
+      - ./bazarr/config:/config
+      - ../data/movies:/movies
+      - ../data/tv:/tv
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    networks:
+      - media-network

@@ -1,0 +1,17 @@
+services:
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    restart: unless-stopped
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./config:/app/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    networks:
+      - media-network
+    depends_on:
+      - jellyfin
