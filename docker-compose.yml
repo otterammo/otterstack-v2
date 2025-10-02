@@ -5,6 +5,7 @@ include:
   - jellyseerr/docker-compose.yml
   - servarr/docker-compose.yml
   - qbittorrent/docker-compose.yaml
+  - cloudflared/docker-compose.yml
 
 networks:
   media-network:
