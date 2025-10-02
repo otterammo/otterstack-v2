@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Server Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+        .service-card h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+        .service-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .service-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: background 0.3s ease;
+            font-weight: 500;
+        }
+        .service-link:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+        .admin-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .admin-section h3 {
+            color: #333;
+            margin-top: 0;
+        }
+        .note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Media Server Dashboard</h1>
+        
+        <div class="services-grid">
+            <div class="service-card">
+                <h3>🎥 Jellyfin</h3>
+                <p>Media streaming and library management</p>
+                <a href="http://jellyfin.local" class="service-link">Open Jellyfin</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🎬 Jellyseerr</h3>
+                <p>Request movies and TV shows</p>
+                <a href="http://jellyseerr.local" class="service-link">Open Jellyseerr</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>📺 Sonarr</h3>
+                <p>TV series management</p>
+                <a href="http://sonarr.local" class="service-link">Open Sonarr</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🎞️ Radarr</h3>
+                <p>Movie management</p>
+                <a href="http://radarr.local" class="service-link">Open Radarr</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🔍 Prowlarr</h3>
+                <p>Indexer management</p>
+                <a href="http://prowlarr.local" class="service-link">Open Prowlarr</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>📝 Bazarr</h3>
+                <p>Subtitle management</p>
+                <a href="http://bazarr.local" class="service-link">Open Bazarr</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>⬇️ qBittorrent</h3>
+                <p>Download client</p>
+                <a href="http://qbittorrent.local" class="service-link">Open qBittorrent</a>
+            </div>
+            
+            <div class="service-card">
+                <h3>🚦 Traefik</h3>
+                <p>Reverse proxy dashboard</p>
+                <a href="http://traefik.local" class="service-link">Open Traefik</a>
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>📝 Note:</strong> To access these services from other devices on your network, you'll need to add entries to your local DNS or modify the hosts file on each device. See the setup instructions for details.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Server</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+        }
+        
+        .service {
+            margin-bottom: 15px;
+        }
+        
+        .service-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .service-button:hover, .service-button:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hostname-info {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .hostname-info strong {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Media Server</h1>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:8096" class="service-button">
+                🎥 Jellyfin
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:5055" class="service-button">
+                🎬 Jellyseerr
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:8989" class="service-button">
+                📺 Sonarr
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:7878" class="service-button">
+                🎞️ Radarr
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:9696" class="service-button">
+                🔍 Prowlarr
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:6767" class="service-button">
+                📝 Bazarr
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:8080" class="service-button">
+                ⬇️ qBittorrent
+            </a>
+        </div>
+        
+        <div class="service">
+            <a href="http://192.168.86.111:8090" class="service-button">
+                🚦 Traefik
+            </a>
+        </div>
+        
+        <div class="hostname-info">
+            <strong>Alternative URLs:</strong><br>
+            Try using <strong>dell-optiplex-3040.local</strong> instead of the IP address if your device supports mDNS.
+        </div>
+    </div>
+</body>
+</html>

@@ -21,3 +21,10 @@ services:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.local
     networks:
       - media-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.local`) || Host(`dell-optiplex-3040.local`) && PathPrefix(`/jellyfin`)"
+      - "traefik.http.routers.jellyfin-root.rule=Host(`jellyfin.local`)"
+      - "traefik.http.routers.jellyfin.entrypoints=web"
+      - "traefik.http.routers.jellyfin-root.entrypoints=web"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
