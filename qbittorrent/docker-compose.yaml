@@ -9,7 +9,7 @@ services:
       - "6881:6881/udp"
     volumes:
       - ./qbittorrent/config:/config
-      - ../data/downloads:/downloads
+      - /mnt/external/downloads:/downloads
     environment:
       - PUID=1000
       - PGID=1000

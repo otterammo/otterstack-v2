@@ -7,8 +7,8 @@ services:
       - "8989:8989"
     volumes:
       - ./sonarr/config:/config
-      - ../data/tv:/tv
-      - ../data/downloads:/downloads
+      - /mnt/external/tv:/tv
+      - /mnt/external/downloads:/downloads
     environment:
       - PUID=1000
       - PGID=1000
@@ -24,8 +24,8 @@ services:
       - "7878:7878"
     volumes:
       - ./radarr/config:/config
-      - ../data/movies:/movies
-      - ../data/downloads:/downloads
+      - /mnt/external/movies:/movies
+      - /mnt/external/downloads:/downloads
     environment:
       - PUID=1000
       - PGID=1000
@@ -56,8 +56,8 @@ services:
       - "6767:6767"
     volumes:
       - ./bazarr/config:/config
-      - ../data/movies:/movies
-      - ../data/tv:/tv
+      - /mnt/external/movies:/movies
+      - /mnt/external/tv:/tv
     environment:
       - PUID=1000
       - PGID=1000

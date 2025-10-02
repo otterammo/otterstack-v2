@@ -11,9 +11,9 @@ services:
     volumes:
       - ./config:/config
       - ./cache:/cache
-      - ../data/movies:/media/movies:ro
-      - ../data/tv:/media/tv:ro
-      - ../data/music:/media/music:ro
+      - /mnt/external/movies:/media/movies:ro
+      - /mnt/external/tv:/media/tv:ro
+      - /mnt/external/music:/media/music:ro
     environment:
       - PUID=1000
       - PGID=1000
