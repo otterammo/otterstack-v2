@@ -107,8 +107,8 @@ services:
       - "6767:6767"
     volumes:
       - ./bazarr/config:/config
-      - ${MOVIES_PATH:-/mnt/external/movies}:/movies:ro
-      - ${TV_PATH:-/mnt/external/tv}:/tv:ro
+      - ${MOVIES_PATH:-/mnt/external/movies}:/movies
+      - ${TV_PATH:-/mnt/external/tv}:/tv
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
