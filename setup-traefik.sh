@@ -81,7 +81,10 @@ $IP prowlarr.local
 $IP qbittorrent.local
 $IP radarr.local
 $IP sonarr.local
-$IP traefik.local"
+$IP traefik.local
+$IP grafana.local
+$IP prometheus.local
+$IP cadvisor.local"
 fi
 
 echo -e "${GREEN}[HOSTS]${NC} To access services from other devices, add these entries to their hosts file:"
@@ -122,6 +125,9 @@ else
     echo -e "  ${WHITE}•${NC} Bazarr: ${CYAN}http://bazarr.local${NC}"
     echo -e "  ${WHITE}•${NC} qBittorrent: ${CYAN}http://qbittorrent.local${NC}"
     echo -e "  ${WHITE}•${NC} Traefik Dashboard: ${CYAN}http://traefik.local${NC}"
+    echo -e "  ${WHITE}•${NC} Grafana: ${CYAN}http://grafana.local${NC}"
+    echo -e "  ${WHITE}•${NC} Prometheus: ${CYAN}http://prometheus.local${NC}"
+    echo -e "  ${WHITE}•${NC} cAdvisor: ${CYAN}http://cadvisor.local${NC}"
 fi
 echo ""
 echo -e "${PURPLE}[DASHBOARD]${NC} Or use the dashboard: ${CYAN}file://$(pwd)/dashboard/dashboard.html${NC}"

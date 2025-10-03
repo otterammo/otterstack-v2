@@ -10,7 +10,7 @@ services:
     networks:
       - media-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/mobile-dashboard.html"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:80/dashboard.html"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -6,6 +6,7 @@ include:
   - servarr/docker-compose.yml
   - qbittorrent/docker-compose.yml
   - cloudflared/docker-compose.yml
+  - monitoring/docker-compose.yml
 
 networks:
   media-network:
