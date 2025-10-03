@@ -19,6 +19,12 @@ services:
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
       - JELLYFIN_PublishedServerUrl=http://${JELLYFIN_DOMAIN:-jellyfin.local}
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
     networks:
       - media-network
     healthcheck:
