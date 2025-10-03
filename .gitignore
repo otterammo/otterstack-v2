@@ -2,3 +2,10 @@
 cache/
 config/
 data/
+
+# Fail2ban
+fail2ban/fail2ban-db/
+fail2ban/config/jail.local
+
+# Traefik logs
+traefik/logs/

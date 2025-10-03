@@ -22,11 +22,14 @@ services:
       # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
+      - "--accesslog.bufferingsize=100"
     ports:
       - "80:80"       # HTTP
       - "8090:8080"   # Traefik dashboard (avoiding conflict with qBittorrent)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./logs:/var/log/traefik
     environment:
       - TZ=${TZ:-UTC}
     networks:

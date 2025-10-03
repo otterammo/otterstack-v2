@@ -52,3 +52,28 @@ This stack includes Cloudflare Tunnel (cloudflared) for secure remote access wit
    ```
 
 For detailed setup instructions, see `cloudflared/README.md`.
+
+## Security with Fail2ban
+
+This stack includes Fail2ban for automatic IP banning to protect against brute force attacks and malicious bots.
+
+### Features
+
+- **Authentication Protection**: Automatically bans IPs with repeated 401/403 errors
+- **Bot/Scanner Protection**: Blocks IPs trying to access common vulnerable paths
+- **Email Notifications**: Optional alerts when IPs are banned (requires SMTP configuration)
+
+### Quick Commands
+
+View banned IPs:
+```bash
+docker exec fail2ban fail2ban-client status traefik-auth
+```
+
+Manually unban an IP:
+```bash
+docker exec fail2ban fail2ban-client set traefik-auth unbanip <IP_ADDRESS>
+```
+
+For detailed configuration and usage, see `fail2ban/README.md`.
+
