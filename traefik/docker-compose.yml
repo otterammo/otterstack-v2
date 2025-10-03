@@ -7,7 +7,7 @@ services:
       # Enable Docker provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=media-network"
+      - "--providers.docker.network=${NETWORK_NAME:-media-network}"
       
       # Entry points
       - "--entrypoints.web.address=:80"
@@ -15,6 +15,9 @@ services:
       # API and dashboard
       - "--api.dashboard=true"
       - "--api.insecure=true"
+      
+      # Health check endpoint
+      - "--ping=true"
       
       # Logs
       - "--log.level=INFO"
@@ -24,9 +27,17 @@ services:
       - "8090:8080"   # Traefik dashboard (avoiding conflict with qBittorrent)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=${TZ:-UTC}
     networks:
       - media-network
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
       - "traefik.http.routers.traefik.service=api@internal"

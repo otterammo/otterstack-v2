@@ -9,16 +9,22 @@ services:
       - "6881:6881/udp"
     volumes:
       - ./qbittorrent/config:/config
-      - /mnt/external/downloads:/downloads
+      - ${DOWNLOADS_PATH:-/mnt/external/downloads}:/downloads
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=UTC
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
       - WEBUI_PORT=8080
     networks:
       - media-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`qbittorrent.local`)"
+      - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.local}`)"
       - "traefik.http.routers.qbittorrent.entrypoints=web"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"

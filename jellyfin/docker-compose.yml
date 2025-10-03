@@ -11,20 +11,24 @@ services:
     volumes:
       - ./config:/config
       - ./cache:/cache
-      - /mnt/external/movies:/media/movies:ro
-      - /mnt/external/tv:/media/tv:ro
-      - /mnt/external/music:/media/music:ro
+      - ${MOVIES_PATH:-/mnt/external/movies}:/media/movies:ro
+      - ${TV_PATH:-/mnt/external/tv}:/media/tv:ro
+      - ${MUSIC_PATH:-/mnt/external/music}:/media/music:ro
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=UTC
-      - JELLYFIN_PublishedServerUrl=http://jellyfin.local
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+      - JELLYFIN_PublishedServerUrl=http://${JELLYFIN_DOMAIN:-jellyfin.local}
     networks:
       - media-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.local`) || Host(`dell-optiplex-3040.local`) && PathPrefix(`/jellyfin`)"
-      - "traefik.http.routers.jellyfin-root.rule=Host(`jellyfin.local`)"
+      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN:-jellyfin.local}`)"
       - "traefik.http.routers.jellyfin.entrypoints=web"
-      - "traefik.http.routers.jellyfin-root.entrypoints=web"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"

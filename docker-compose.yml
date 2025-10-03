@@ -4,9 +4,10 @@ include:
   - jellyfin/docker-compose.yml
   - jellyseerr/docker-compose.yml
   - servarr/docker-compose.yml
-  - qbittorrent/docker-compose.yaml
+  - qbittorrent/docker-compose.yml
   - cloudflared/docker-compose.yml
 
 networks:
   media-network:
+    name: ${NETWORK_NAME:-media-network}
     driver: bridge

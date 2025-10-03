@@ -5,10 +5,18 @@ services:
     restart: unless-stopped
     ports:
       - "3000:80"
+    environment:
+      - TZ=${TZ:-UTC}
     networks:
       - media-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dashboard.rule=Host(`dashboard.local`)"
+      - "traefik.http.routers.dashboard.rule=Host(`dashboard${DOMAIN_SUFFIX:-.local}`)"
       - "traefik.http.routers.dashboard.entrypoints=web"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"
