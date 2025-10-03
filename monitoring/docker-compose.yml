@@ -145,3 +145,40 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=false"
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: unless-stopped
+    user: "${PUID:-65534}:${PGID:-65534}"
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/config:/etc/alertmanager
+      - ./alertmanager/data:/alertmanager
+    environment:
+      - PUID=${PUID:-65534}
+      - PGID=${PGID:-65534}
+      - TZ=${TZ:-UTC}
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    networks:
+      - media-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9093/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.local`)"
+      - "traefik.http.routers.alertmanager.entrypoints=web"
+      - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"

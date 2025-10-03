@@ -84,7 +84,8 @@ $IP sonarr.local
 $IP traefik.local
 $IP grafana.local
 $IP prometheus.local
-$IP cadvisor.local"
+$IP cadvisor.local
+$IP alertmanager.local"
 fi
 
 echo -e "${GREEN}[HOSTS]${NC} To access services from other devices, add these entries to their hosts file:"
@@ -128,6 +129,7 @@ else
     echo -e "  ${WHITE}•${NC} Grafana: ${CYAN}http://grafana.local${NC}"
     echo -e "  ${WHITE}•${NC} Prometheus: ${CYAN}http://prometheus.local${NC}"
     echo -e "  ${WHITE}•${NC} cAdvisor: ${CYAN}http://cadvisor.local${NC}"
+    echo -e "  ${WHITE}•${NC} Alertmanager: ${CYAN}http://alertmanager.local${NC}"
 fi
 echo ""
 echo -e "${PURPLE}[DASHBOARD]${NC} Or use the dashboard: ${CYAN}file://$(pwd)/dashboard/dashboard.html${NC}"
@@ -148,6 +150,10 @@ get_service_ports() {
         ["qbittorrent"]="8080"
         ["traefik"]="8090"
         ["media-dashboard"]="3000"
+        ["grafana"]="3001"
+        ["prometheus"]="9090"
+        ["cadvisor"]="8081"
+        ["alertmanager"]="9093"
     )
     
     # Check if docker is available
