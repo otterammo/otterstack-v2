@@ -3,552 +3,655 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Otterammo Media Status</title>
-    <meta name="description" content="Live status for the Otterammo media services exposed on the public internet.">
+    <title>Otterammo Media</title>
+    <meta name="description" content="Your entertainment hub - stream movies, shows, and request new content anytime.">
     <style>
         :root {
             color-scheme: light dark;
-            --bg: #0f172a;
-            --surface: rgba(15, 23, 42, 0.65);
-            --surface-strong: rgba(15, 23, 42, 0.92);
-            --text-primary: #e2e8f0;
-            --text-secondary: #94a3b8;
+            --bg-start: #0f172a;
+            --bg-end: #1e293b;
+            --surface: rgba(30, 41, 59, 0.75);
+            --surface-strong: rgba(30, 41, 59, 0.95);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
             --accent: #38bdf8;
-            --accent-strong: #0ea5e9;
-            --border: rgba(148, 163, 184, 0.25);
-            --online-bg: rgba(34, 197, 94, 0.16);
-            --online-text: #22c55e;
-            --offline-bg: rgba(239, 68, 68, 0.16);
-            --offline-text: #ef4444;
-            --degraded-bg: rgba(234, 179, 8, 0.16);
-            --degraded-text: #facc15;
-            --checking-bg: rgba(14, 165, 233, 0.14);
-            --checking-text: #38bdf8;
-            --shadow: 0 24px 48px rgba(8, 47, 73, 0.35);
+            --accent-glow: rgba(56, 189, 248, 0.4);
+            --online: #10b981;
+            --online-glow: rgba(16, 185, 129, 0.3);
+            --offline: #f87171;
+            --offline-glow: rgba(248, 113, 113, 0.3);
+            --checking: #fbbf24;
+            --checking-glow: rgba(251, 191, 36, 0.3);
+            --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            --glow-shadow: 0 0 20px;
         }
 
         @media (prefers-color-scheme: light) {
             :root {
-                --bg: #f8fafc;
-                --surface: rgba(255, 255, 255, 0.8);
-                --surface-strong: rgba(255, 255, 255, 0.95);
+                --bg-start: #f0f9ff;
+                --bg-end: #e0f2fe;
+                --surface: rgba(255, 255, 255, 0.85);
+                --surface-strong: rgba(255, 255, 255, 0.98);
                 --text-primary: #0f172a;
                 --text-secondary: #475569;
                 --accent: #0284c7;
-                --accent-strong: #0369a1;
-                --border: rgba(100, 116, 139, 0.2);
+                --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             }
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            margin: 0;
-            font-family: "Inter", "Segoe UI", Roboto, sans-serif;
-            background: radial-gradient(circle at top, rgba(14, 116, 144, 0.35), transparent 55%), var(--bg);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
+            background-attachment: fixed;
             color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: twinkle 4s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
         header {
-            padding: 72px 24px 40px;
+            text-align: center;
+            padding: 60px 20px 40px;
         }
 
-        .hero {
-            max-width: 960px;
-            margin: 0 auto;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 32px;
-            padding: 48px;
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(18px);
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
         }
 
-        .hero small {
-            letter-spacing: 0.32em;
-            text-transform: uppercase;
-            font-weight: 600;
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: clamp(1rem, 3vw, 1.3rem);
             color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
         }
 
-        .hero h1 {
-            margin: 12px 0 16px;
-            font-size: clamp(2.1rem, 4vw, 2.75rem);
-            letter-spacing: -0.015em;
-        }
-
-        .hero p {
-            margin: 0;
-            max-width: 560px;
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: var(--text-secondary);
-        }
-
-        .status-banner {
-            margin-top: 28px;
+        .status-indicator {
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 18px;
-            border-radius: 999px;
-            background: var(--surface-strong);
-            border: 1px solid var(--border);
-            box-shadow: 0 16px 32px rgba(8, 47, 73, 0.28);
+            padding: 16px 32px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 999px;
-            background: var(--checking-bg);
-            box-shadow: 0 0 12px var(--checking-text);
+        .pulse-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--checking);
+            box-shadow: var(--glow-shadow) var(--checking-glow);
+            position: relative;
+            animation: pulse 2s infinite;
         }
 
-        .status-dot.online {
-            background: var(--online-text);
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.55);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .status-dot.offline {
-            background: var(--offline-text);
-            box-shadow: 0 0 12px rgba(239, 68, 68, 0.55);
+        .pulse-dot::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            background: inherit;
+            opacity: 0.3;
+            animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
 
-        .status-dot.degraded {
-            background: var(--degraded-text);
-            box-shadow: 0 0 12px rgba(250, 204, 21, 0.55);
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2);
+                opacity: 0;
+            }
         }
 
-        main {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 24px 72px;
+        .pulse-dot.online {
+            background: var(--online);
+            box-shadow: var(--glow-shadow) var(--online-glow);
         }
 
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            margin-bottom: 32px;
+        .pulse-dot.offline {
+            background: var(--offline);
+            box-shadow: var(--glow-shadow) var(--offline-glow);
+            animation: none;
         }
 
-        .toolbar button {
-            background: var(--accent);
-            border: 1px solid transparent;
-            color: #f8fafc;
+        .status-text {
             font-weight: 600;
-            padding: 12px 20px;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 16px 24px rgba(56, 189, 248, 0.25);
+            font-size: 1.1rem;
         }
 
-        .toolbar button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 20px 32px rgba(56, 189, 248, 0.35);
-        }
-
-        .toolbar button:disabled {
-            cursor: progress;
-            opacity: 0.7;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .timestamp, .summary {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .summary strong {
-            color: var(--text-primary);
-        }
-
-        .service-grid {
+        .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+            width: 100%;
         }
 
         .service-card {
-            position: relative;
-            padding: 28px;
-            border-radius: 28px;
             background: var(--surface);
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            backdrop-filter: blur(14px);
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .service-heading {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #06b6d4);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .service-heading h3 {
-            margin: 0;
-            font-size: 1.35rem;
-            letter-spacing: -0.01em;
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
         }
 
-        .service-heading span {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+        .service-card:hover::before {
+            opacity: 1;
+        }
+
+        .service-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .service-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
         }
 
         .service-description {
             color: var(--text-secondary);
-            font-size: 0.98rem;
-            line-height: 1.7;
-            flex: 1;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 1rem;
         }
 
-        .status-pill {
+        .service-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border-radius: 999px;
-            font-size: 0.88rem;
-            font-weight: 600;
             padding: 8px 16px;
-            letter-spacing: 0.02em;
-        }
-
-        .status-pill::before {
-            content: "";
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: currentColor;
-            box-shadow: 0 0 6px currentColor;
-        }
-
-        .status-pill.online {
-            background: var(--online-bg);
-            color: var(--online-text);
-        }
-
-        .status-pill.offline {
-            background: var(--offline-bg);
-            color: var(--offline-text);
-        }
-
-        .status-pill.degraded {
-            background: var(--degraded-bg);
-            color: var(--degraded-text);
-        }
-
-        .status-pill.checking {
-            background: var(--checking-bg);
-            color: var(--checking-text);
-        }
-
-        .service-meta {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            font-size: 0.92rem;
-        }
-
-        .service-meta span {
-            display: block;
-            color: var(--text-secondary);
-        }
-
-        .service-meta strong {
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-
-        .service-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .service-actions a {
-            text-decoration: none;
-            background: var(--surface-strong);
-            color: var(--accent-strong);
-            padding: 10px 16px;
-            border-radius: 14px;
+            border-radius: 20px;
             font-weight: 600;
-            border: 1px solid var(--border);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .service-actions a:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 12px 24px rgba(8, 47, 73, 0.35);
+        .status-badge.online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--online);
+        }
+
+        .status-badge.offline {
+            background: rgba(248, 113, 113, 0.2);
+            color: var(--offline);
+        }
+
+        .status-badge.checking {
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--checking);
+        }
+
+        .open-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .open-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px var(--accent-glow);
+        }
+
+        .open-button:active {
+            transform: scale(0.98);
+        }
+
+        .footer-info {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .refresh-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 25px var(--accent-glow);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 100;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .refresh-button:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .refresh-button:active {
+            transform: scale(0.95) rotate(90deg);
+        }
+
+        .refresh-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .alert {
-            margin-top: 16px;
-            padding: 14px 18px;
+            background: rgba(248, 113, 113, 0.2);
+            border: 2px solid var(--offline);
             border-radius: 16px;
-            border: 1px solid;
-            font-size: 0.95rem;
+            padding: 20px 24px;
+            margin: 20px auto;
+            max-width: 800px;
+            width: calc(100% - 40px);
+            color: var(--text-primary);
             display: none;
-        }
-
-        .alert.error {
-            display: block;
-            background: rgba(239, 68, 68, 0.16);
-            border-color: rgba(239, 68, 68, 0.4);
-            color: #fecaca;
-        }
-
-        footer {
-            margin-top: 64px;
-            padding: 32px 0;
-            color: var(--text-secondary);
             text-align: center;
-            font-size: 0.9rem;
+            line-height: 1.6;
         }
 
-        @media (max-width: 720px) {
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
             header {
-                padding: 48px 18px 32px;
+                padding: 40px 16px 30px;
             }
 
-            .hero {
-                padding: 32px 24px;
-                border-radius: 24px;
+            .logo {
+                font-size: 3rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 20px 16px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                margin: 40px 0;
             }
 
             .service-card {
-                padding: 24px;
+                padding: 30px 24px;
             }
 
-            .service-meta {
-                grid-template-columns: 1fr;
+            .service-icon {
+                font-size: 3rem;
+            }
+
+            .service-name {
+                font-size: 1.5rem;
+            }
+
+            .service-status {
+                flex-direction: column;
+                gap: 16px;
+                align-items: stretch;
+            }
+
+            .open-button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .status-indicator {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+
+            .status-text {
+                font-size: 1rem;
+            }
+
+            .refresh-button {
+                bottom: 20px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+            }
+
+            .footer-info {
+                padding: 30px 16px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .service-card {
+                padding: 24px 20px;
+            }
+
+            .service-icon {
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="hero">
-            <small>Otterammo Network</small>
-            <h1>Public media service status</h1>
-            <p>Live visibility into the two services we publish on the public internet. Bookmark this page to confirm availability before you stream or submit new requests.</p>
-            <div class="status-banner" id="status-banner">
-                <span class="status-dot" id="status-dot"></span>
-                <span id="status-text">Checking services…</span>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">🦦</div>
+            <h1>Otterammo Media</h1>
+            <p class="tagline">Your personal entertainment hub. Stream your favorite content and request new additions.</p>
+            <div class="status-indicator" id="status-indicator">
+                <div class="pulse-dot" id="pulse-dot"></div>
+                <span class="status-text" id="status-text">Checking services...</span>
             </div>
-        </div>
-    </header>
-    <main>
-        <div class="toolbar">
-            <div class="summary" id="summary">All systems are being checked.</div>
-            <div class="timestamp" id="timestamp">Last updated: pending</div>
-            <button id="refresh-button" type="button">Refresh status</button>
-        </div>
-        <div class="alert error" id="error-banner"></div>
-        <section class="service-grid" id="service-grid"></section>
-        <footer>
-            Status data refreshes automatically every 60 seconds. Problems or downtime? Contact the Otterammo admins through the usual support channel.
-        </footer>
-    </main>
-    <script>
-        const serviceGrid = document.getElementById('service-grid');
-        const summaryEl = document.getElementById('summary');
-        const timestampEl = document.getElementById('timestamp');
-        const refreshButton = document.getElementById('refresh-button');
-        const statusDot = document.getElementById('status-dot');
-        const statusText = document.getElementById('status-text');
-        const errorBanner = document.getElementById('error-banner');
-        const AUTO_REFRESH_MS = 60_000;
-        let servicesCache = [];
-        let autoRefreshHandle = null;
+        </header>
 
-        const statusLabels = {
-            online: 'Online',
-            offline: 'Offline',
-            degraded: 'Degraded',
-            checking: 'Checking'
+        <div class="alert" id="alert"></div>
+
+        <div class="services-grid" id="services-grid">
+        </div>
+
+        <div class="footer-info">
+            <p>Status updates automatically every minute</p>
+            <p>Need help? Contact your Otterammo admin</p>
+        </div>
+    </div>
+
+    <button class="refresh-button" id="refresh-button" title="Refresh status" aria-label="Refresh">↻</button>
+
+    <script>
+        const AUTO_REFRESH_MS = 60_000;
+        const serviceIcons = {
+            jellyfin: '📺',
+            jellyseerr: '🎬',
+            default: '🌐'
         };
 
-        function setStatusBanner(state, message) {
-            statusDot.className = `status-dot ${state}`;
-            statusText.textContent = message;
+        const serviceDescriptions = {
+            jellyfin: 'Stream movies, TV shows, and music from your personal library',
+            jellyseerr: 'Request new movies and shows to be added to the collection',
+            default: 'Access this service'
+        };
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 4 + 's';
+                starsContainer.appendChild(star);
+            }
         }
 
-        function toggleLoading(isLoading) {
-            refreshButton.disabled = isLoading;
-            refreshButton.textContent = isLoading ? 'Refreshing…' : 'Refresh status';
+        function getServiceIcon(serviceName) {
+            const name = serviceName.toLowerCase();
+            for (const key in serviceIcons) {
+                if (name.includes(key)) return serviceIcons[key];
+            }
+            return serviceIcons.default;
         }
 
-        function formatLatency(value) {
-            if (typeof value !== 'number' || Number.isNaN(value)) {
-                return '—';
+        function getServiceDescription(serviceName) {
+            const name = serviceName.toLowerCase();
+            for (const key in serviceDescriptions) {
+                if (name.includes(key)) return serviceDescriptions[key];
             }
-            return `${Math.max(0, value).toFixed(0)} ms`;
-        }
-
-        function formatStatus(result) {
-            if (!result) {
-                return 'checking';
-            }
-            if (!result.online) {
-                return 'offline';
-            }
-                if (typeof result.statusCode === 'number' && result.statusCode >= 400) {
-                return 'degraded';
-            }
-            return 'online';
+            return serviceDescriptions.default;
         }
 
         function renderServices(services) {
-            serviceGrid.innerHTML = '';
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = '';
+            
             services.forEach(service => {
-                const card = document.createElement('article');
+                const card = document.createElement('div');
                 card.className = 'service-card';
                 card.dataset.serviceId = service.id;
+                
+                const icon = getServiceIcon(service.name);
+                const description = getServiceDescription(service.name);
+                
                 card.innerHTML = `
-                    <div class="service-heading">
-                        <h3>${service.name}</h3>
-                        <span>${service.displayUrl}</span>
-                    </div>
-                    <div class="service-description">${service.description}</div>
-                    <div class="status-pill checking" data-role="status-pill">${statusLabels.checking}</div>
-                    <div class="service-meta">
-                        <div>
-                            <span>Endpoint</span>
-                            <strong>${service.url}</strong>
-                        </div>
-                        <div>
-                            <span>Latency</span>
-                            <strong data-role="latency">—</strong>
-                        </div>
-                        <div>
-                            <span>Status code</span>
-                            <strong data-role="status-code">—</strong>
-                        </div>
-                        <div>
-                            <span>Last error</span>
-                            <strong data-role="error">None</strong>
-                        </div>
-                    </div>
-                    <div class="service-actions">
-                        <a href="${service.url}" target="_blank" rel="noopener">Open service</a>
+                    <span class="service-icon">${icon}</span>
+                    <h2 class="service-name">${service.name}</h2>
+                    <p class="service-description">${description}</p>
+                    <div class="service-status">
+                        <span class="status-badge checking" data-status>Checking...</span>
+                        <a href="${service.url}" target="_blank" rel="noopener" class="open-button">
+                            Open →
+                        </a>
                     </div>
                 `;
-                serviceGrid.appendChild(card);
+                
+                grid.appendChild(card);
             });
         }
 
-        function updateCards(results) {
-            results.forEach(result => {
-                const card = serviceGrid.querySelector(`[data-service-id="${result.id}"]`);
-                if (!card) return;
-
-                const state = formatStatus(result);
-                const statusPill = card.querySelector('[data-role="status-pill"]');
-                statusPill.className = `status-pill ${state}`;
-                statusPill.textContent = statusLabels[state] || statusLabels.checking;
-
-                const latency = card.querySelector('[data-role="latency"]');
-                latency.textContent = formatLatency(result.latencyMs);
-
-                const statusCode = card.querySelector('[data-role="status-code"]');
-                statusCode.textContent = result.statusCode ?? '—';
-
-                const errorEl = card.querySelector('[data-role="error"]');
-                errorEl.textContent = result.error ? result.error : 'None';
-            });
+        function updateServiceStatus(serviceId, status) {
+            const card = document.querySelector(`[data-service-id="${serviceId}"]`);
+            if (!card) return;
+            
+            const badge = card.querySelector('[data-status]');
+            const isOnline = status.online;
+            const statusClass = isOnline ? 'online' : 'offline';
+            const statusText = isOnline ? 'Available' : 'Unavailable';
+            
+            badge.className = `status-badge ${statusClass}`;
+            badge.textContent = statusText;
         }
 
-        function updateSummary(summary) {
-            summaryEl.innerHTML = `
-                <span style="color: var(--online-text); font-weight: 600;">${summary.online}</span> online ·
-                <span style="color: var(--offline-text); font-weight: 600;">${summary.offline}</span> offline ·
-                Uptime: <strong>${summary.uptime}%</strong>
-            `;
-        }
-
-        function handleHealthResponse(data) {
-            if (!data.success) {
-                throw new Error('Failed to load status data');
-            }
-
-            updateCards(data.services);
-            updateSummary(data.summary);
-            timestampEl.textContent = `Last updated: ${new Date(data.timestamp).toLocaleString()}`;
-
-            const offlineServices = data.services.filter(item => !item.online);
-            if (offlineServices.length === 0) {
-                setStatusBanner('online', 'All systems operational');
-                errorBanner.style.display = 'none';
+        function updateOverallStatus(services) {
+            const pulseDot = document.getElementById('pulse-dot');
+            const statusText = document.getElementById('status-text');
+            const alert = document.getElementById('alert');
+            
+            const onlineCount = services.filter(s => s.online).length;
+            const totalCount = services.length;
+            
+            if (onlineCount === totalCount) {
+                pulseDot.className = 'pulse-dot online';
+                statusText.textContent = 'All systems operational';
+                alert.classList.remove('show');
+            } else if (onlineCount === 0) {
+                pulseDot.className = 'pulse-dot offline';
+                statusText.textContent = 'All services offline';
+                alert.textContent = 'All services are currently unavailable. Please try again later.';
+                alert.classList.add('show');
             } else {
-                const names = offlineServices.map(item => item.name).join(', ');
-                setStatusBanner('offline', 'Some services are offline');
-                errorBanner.textContent = `The following services did not respond successfully: ${names}.`;
-                errorBanner.style.display = 'block';
+                pulseDot.className = 'pulse-dot offline';
+                statusText.textContent = `${onlineCount} of ${totalCount} services available`;
+                const offlineServices = services.filter(s => !s.online).map(s => s.name).join(', ');
+                alert.textContent = `Some services are offline: ${offlineServices}`;
+                alert.classList.add('show');
             }
         }
 
         async function refreshStatus() {
-            toggleLoading(true);
-            setStatusBanner('checking', 'Checking services…');
-            errorBanner.style.display = 'none';
-
+            const button = document.getElementById('refresh-button');
+            button.disabled = true;
+            
             try {
-                const response = await fetch('/api/health', { cache: 'no-store' });
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status}`);
+                const [servicesRes, healthRes] = await Promise.all([
+                    fetch('/api/services', { cache: 'no-store' }),
+                    fetch('/api/health', { cache: 'no-store' })
+                ]);
+                
+                if (!servicesRes.ok || !healthRes.ok) {
+                    throw new Error('Failed to fetch status');
                 }
-                const data = await response.json();
-                handleHealthResponse(data);
+                
+                const servicesData = await servicesRes.json();
+                const healthData = await healthRes.json();
+                
+                if (document.getElementById('services-grid').children.length === 0) {
+                    renderServices(servicesData.services);
+                }
+                
+                healthData.services.forEach(service => {
+                    updateServiceStatus(service.id, service);
+                });
+                
+                updateOverallStatus(healthData.services);
+                
             } catch (error) {
-                console.error('Unable to refresh status', error);
-                setStatusBanner('offline', 'Unable to reach status API');
-                errorBanner.textContent = 'The status API is not reachable right now. Please retry in a moment.';
-                errorBanner.style.display = 'block';
-                summaryEl.innerHTML = '<span style="color: var(--offline-text); font-weight: 600;">Status unavailable</span>';
+                console.error('Failed to refresh status:', error);
+                const pulseDot = document.getElementById('pulse-dot');
+                const statusText = document.getElementById('status-text');
+                const alert = document.getElementById('alert');
+                
+                pulseDot.className = 'pulse-dot offline';
+                statusText.textContent = 'Status check failed';
+                alert.textContent = 'Unable to check service status. Please refresh the page.';
+                alert.classList.add('show');
             } finally {
-                toggleLoading(false);
+                button.disabled = false;
             }
         }
 
-        async function bootstrap() {
-            try {
-                const response = await fetch('/api/services', { cache: 'no-store' });
-                if (!response.ok) {
-                    throw new Error(`Unable to load service catalogue (${response.status})`);
-                }
-                const data = await response.json();
-                servicesCache = data.services || [];
-                renderServices(servicesCache);
-                await refreshStatus();
-            } catch (error) {
-                console.error('Unable to bootstrap dashboard', error);
-                setStatusBanner('offline', 'Failed to load service catalogue');
-                errorBanner.textContent = 'The dashboard could not load the list of public services. Please refresh the page later.';
-                errorBanner.style.display = 'block';
-            }
-
-            if (autoRefreshHandle) {
-                clearInterval(autoRefreshHandle);
-            }
-            autoRefreshHandle = setInterval(refreshStatus, AUTO_REFRESH_MS);
-        }
-
-        refreshButton.addEventListener('click', refreshStatus);
-        bootstrap();
+        document.getElementById('refresh-button').addEventListener('click', refreshStatus);
+        
+        createStars();
+        refreshStatus();
+        setInterval(refreshStatus, AUTO_REFRESH_MS);
     </script>
 </body>
 </html>
