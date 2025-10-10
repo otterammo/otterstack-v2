@@ -1,4 +1,5 @@
 .env
+.github/
 cache/
 config/
 data/
