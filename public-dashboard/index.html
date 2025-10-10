@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Otterammo Media Status</title>
+    <meta name="description" content="Live status for the Otterammo media services exposed on the public internet.">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: #0f172a;
+            --surface: rgba(15, 23, 42, 0.65);
+            --surface-strong: rgba(15, 23, 42, 0.92);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --accent-strong: #0ea5e9;
+            --border: rgba(148, 163, 184, 0.25);
+            --online-bg: rgba(34, 197, 94, 0.16);
+            --online-text: #22c55e;
+            --offline-bg: rgba(239, 68, 68, 0.16);
+            --offline-text: #ef4444;
+            --degraded-bg: rgba(234, 179, 8, 0.16);
+            --degraded-text: #facc15;
+            --checking-bg: rgba(14, 165, 233, 0.14);
+            --checking-text: #38bdf8;
+            --shadow: 0 24px 48px rgba(8, 47, 73, 0.35);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f8fafc;
+                --surface: rgba(255, 255, 255, 0.8);
+                --surface-strong: rgba(255, 255, 255, 0.95);
+                --text-primary: #0f172a;
+                --text-secondary: #475569;
+                --accent: #0284c7;
+                --accent-strong: #0369a1;
+                --border: rgba(100, 116, 139, 0.2);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+            background: radial-gradient(circle at top, rgba(14, 116, 144, 0.35), transparent 55%), var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 72px 24px 40px;
+        }
+
+        .hero {
+            max-width: 960px;
+            margin: 0 auto;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 48px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+        }
+
+        .hero small {
+            letter-spacing: 0.32em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .hero h1 {
+            margin: 12px 0 16px;
+            font-size: clamp(2.1rem, 4vw, 2.75rem);
+            letter-spacing: -0.015em;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 560px;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .status-banner {
+            margin-top: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: var(--surface-strong);
+            border: 1px solid var(--border);
+            box-shadow: 0 16px 32px rgba(8, 47, 73, 0.28);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 999px;
+            background: var(--checking-bg);
+            box-shadow: 0 0 12px var(--checking-text);
+        }
+
+        .status-dot.online {
+            background: var(--online-text);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.55);
+        }
+
+        .status-dot.offline {
+            background: var(--offline-text);
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.55);
+        }
+
+        .status-dot.degraded {
+            background: var(--degraded-text);
+            box-shadow: 0 0 12px rgba(250, 204, 21, 0.55);
+        }
+
+        main {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 24px 72px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .toolbar button {
+            background: var(--accent);
+            border: 1px solid transparent;
+            color: #f8fafc;
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 16px 24px rgba(56, 189, 248, 0.25);
+        }
+
+        .toolbar button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 20px 32px rgba(56, 189, 248, 0.35);
+        }
+
+        .toolbar button:disabled {
+            cursor: progress;
+            opacity: 0.7;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .timestamp, .summary {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .summary strong {
+            color: var(--text-primary);
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .service-card {
+            position: relative;
+            padding: 28px;
+            border-radius: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .service-heading {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .service-heading h3 {
+            margin: 0;
+            font-size: 1.35rem;
+            letter-spacing: -0.01em;
+        }
+
+        .service-heading span {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .service-description {
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            line-height: 1.7;
+            flex: 1;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            padding: 8px 16px;
+            letter-spacing: 0.02em;
+        }
+
+        .status-pill::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: currentColor;
+            box-shadow: 0 0 6px currentColor;
+        }
+
+        .status-pill.online {
+            background: var(--online-bg);
+            color: var(--online-text);
+        }
+
+        .status-pill.offline {
+            background: var(--offline-bg);
+            color: var(--offline-text);
+        }
+
+        .status-pill.degraded {
+            background: var(--degraded-bg);
+            color: var(--degraded-text);
+        }
+
+        .status-pill.checking {
+            background: var(--checking-bg);
+            color: var(--checking-text);
+        }
+
+        .service-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            font-size: 0.92rem;
+        }
+
+        .service-meta span {
+            display: block;
+            color: var(--text-secondary);
+        }
+
+        .service-meta strong {
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .service-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .service-actions a {
+            text-decoration: none;
+            background: var(--surface-strong);
+            color: var(--accent-strong);
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .service-actions a:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(8, 47, 73, 0.35);
+        }
+
+        .alert {
+            margin-top: 16px;
+            padding: 14px 18px;
+            border-radius: 16px;
+            border: 1px solid;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .alert.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.16);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fecaca;
+        }
+
+        footer {
+            margin-top: 64px;
+            padding: 32px 0;
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                padding: 48px 18px 32px;
+            }
+
+            .hero {
+                padding: 32px 24px;
+                border-radius: 24px;
+            }
+
+            .service-card {
+                padding: 24px;
+            }
+
+            .service-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="hero">
+            <small>Otterammo Network</small>
+            <h1>Public media service status</h1>
+            <p>Live visibility into the two services we publish on the public internet. Bookmark this page to confirm availability before you stream or submit new requests.</p>
+            <div class="status-banner" id="status-banner">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Checking services…</span>
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="toolbar">
+            <div class="summary" id="summary">All systems are being checked.</div>
+            <div class="timestamp" id="timestamp">Last updated: pending</div>
+            <button id="refresh-button" type="button">Refresh status</button>
+        </div>
+        <div class="alert error" id="error-banner"></div>
+        <section class="service-grid" id="service-grid"></section>
+        <footer>
+            Status data refreshes automatically every 60 seconds. Problems or downtime? Contact the Otterammo admins through the usual support channel.
+        </footer>
+    </main>
+    <script>
+        const serviceGrid = document.getElementById('service-grid');
+        const summaryEl = document.getElementById('summary');
+        const timestampEl = document.getElementById('timestamp');
+        const refreshButton = document.getElementById('refresh-button');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+        const errorBanner = document.getElementById('error-banner');
+        const AUTO_REFRESH_MS = 60_000;
+        let servicesCache = [];
+        let autoRefreshHandle = null;
+
+        const statusLabels = {
+            online: 'Online',
+            offline: 'Offline',
+            degraded: 'Degraded',
+            checking: 'Checking'
+        };
+
+        function setStatusBanner(state, message) {
+            statusDot.className = `status-dot ${state}`;
+            statusText.textContent = message;
+        }
+
+        function toggleLoading(isLoading) {
+            refreshButton.disabled = isLoading;
+            refreshButton.textContent = isLoading ? 'Refreshing…' : 'Refresh status';
+        }
+
+        function formatLatency(value) {
+            if (typeof value !== 'number' || Number.isNaN(value)) {
+                return '—';
+            }
+            return `${Math.max(0, value).toFixed(0)} ms`;
+        }
+
+        function formatStatus(result) {
+            if (!result) {
+                return 'checking';
+            }
+            if (!result.online) {
+                return 'offline';
+            }
+                if (typeof result.statusCode === 'number' && result.statusCode >= 400) {
+                return 'degraded';
+            }
+            return 'online';
+        }
+
+        function renderServices(services) {
+            serviceGrid.innerHTML = '';
+            services.forEach(service => {
+                const card = document.createElement('article');
+                card.className = 'service-card';
+                card.dataset.serviceId = service.id;
+                card.innerHTML = `
+                    <div class="service-heading">
+                        <h3>${service.name}</h3>
+                        <span>${service.displayUrl}</span>
+                    </div>
+                    <div class="service-description">${service.description}</div>
+                    <div class="status-pill checking" data-role="status-pill">${statusLabels.checking}</div>
+                    <div class="service-meta">
+                        <div>
+                            <span>Endpoint</span>
+                            <strong>${service.url}</strong>
+                        </div>
+                        <div>
+                            <span>Latency</span>
+                            <strong data-role="latency">—</strong>
+                        </div>
+                        <div>
+                            <span>Status code</span>
+                            <strong data-role="status-code">—</strong>
+                        </div>
+                        <div>
+                            <span>Last error</span>
+                            <strong data-role="error">None</strong>
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="${service.url}" target="_blank" rel="noopener">Open service</a>
+                    </div>
+                `;
+                serviceGrid.appendChild(card);
+            });
+        }
+
+        function updateCards(results) {
+            results.forEach(result => {
+                const card = serviceGrid.querySelector(`[data-service-id="${result.id}"]`);
+                if (!card) return;
+
+                const state = formatStatus(result);
+                const statusPill = card.querySelector('[data-role="status-pill"]');
+                statusPill.className = `status-pill ${state}`;
+                statusPill.textContent = statusLabels[state] || statusLabels.checking;
+
+                const latency = card.querySelector('[data-role="latency"]');
+                latency.textContent = formatLatency(result.latencyMs);
+
+                const statusCode = card.querySelector('[data-role="status-code"]');
+                statusCode.textContent = result.statusCode ?? '—';
+
+                const errorEl = card.querySelector('[data-role="error"]');
+                errorEl.textContent = result.error ? result.error : 'None';
+            });
+        }
+
+        function updateSummary(summary) {
+            summaryEl.innerHTML = `
+                <span style="color: var(--online-text); font-weight: 600;">${summary.online}</span> online ·
+                <span style="color: var(--offline-text); font-weight: 600;">${summary.offline}</span> offline ·
+                Uptime: <strong>${summary.uptime}%</strong>
+            `;
+        }
+
+        function handleHealthResponse(data) {
+            if (!data.success) {
+                throw new Error('Failed to load status data');
+            }
+
+            updateCards(data.services);
+            updateSummary(data.summary);
+            timestampEl.textContent = `Last updated: ${new Date(data.timestamp).toLocaleString()}`;
+
+            const offlineServices = data.services.filter(item => !item.online);
+            if (offlineServices.length === 0) {
+                setStatusBanner('online', 'All systems operational');
+                errorBanner.style.display = 'none';
+            } else {
+                const names = offlineServices.map(item => item.name).join(', ');
+                setStatusBanner('offline', 'Some services are offline');
+                errorBanner.textContent = `The following services did not respond successfully: ${names}.`;
+                errorBanner.style.display = 'block';
+            }
+        }
+
+        async function refreshStatus() {
+            toggleLoading(true);
+            setStatusBanner('checking', 'Checking services…');
+            errorBanner.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/health', { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`API returned ${response.status}`);
+                }
+                const data = await response.json();
+                handleHealthResponse(data);
+            } catch (error) {
+                console.error('Unable to refresh status', error);
+                setStatusBanner('offline', 'Unable to reach status API');
+                errorBanner.textContent = 'The status API is not reachable right now. Please retry in a moment.';
+                errorBanner.style.display = 'block';
+                summaryEl.innerHTML = '<span style="color: var(--offline-text); font-weight: 600;">Status unavailable</span>';
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        async function bootstrap() {
+            try {
+                const response = await fetch('/api/services', { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error(`Unable to load service catalogue (${response.status})`);
+                }
+                const data = await response.json();
+                servicesCache = data.services || [];
+                renderServices(servicesCache);
+                await refreshStatus();
+            } catch (error) {
+                console.error('Unable to bootstrap dashboard', error);
+                setStatusBanner('offline', 'Failed to load service catalogue');
+                errorBanner.textContent = 'The dashboard could not load the list of public services. Please refresh the page later.';
+                errorBanner.style.display = 'block';
+            }
+
+            if (autoRefreshHandle) {
+                clearInterval(autoRefreshHandle);
+            }
+            autoRefreshHandle = setInterval(refreshStatus, AUTO_REFRESH_MS);
+        }
+
+        refreshButton.addEventListener('click', refreshStatus);
+        bootstrap();
+    </script>
+</body>
+</html>

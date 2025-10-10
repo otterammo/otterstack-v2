@@ -3,6 +3,7 @@
 cache/
 config/
 data/
+node_modules/
 
 # Fail2ban
 fail2ban/fail2ban-db/

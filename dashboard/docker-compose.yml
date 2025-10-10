@@ -18,10 +18,13 @@ services:
       start_period: 30s  # Allow more time for Node.js to start
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=media-network"
       - "traefik.http.routers.dashboard.rule=Host(`dashboard${DOMAIN_SUFFIX:-.local}`)"
       - "traefik.http.routers.dashboard.entrypoints=web"
+      - "traefik.http.routers.dashboard.service=dashboard"
       - "traefik.http.services.dashboard.loadbalancer.server.port=80"
       # Health API routing
       - "traefik.http.routers.dashboard-api.rule=Host(`dashboard${DOMAIN_SUFFIX:-.local}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.dashboard-api.entrypoints=web"
+      - "traefik.http.routers.dashboard-api.service=dashboard-api"
       - "traefik.http.services.dashboard-api.loadbalancer.server.port=3002"
