@@ -3,145 +3,737 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Server</title>
+    <title>Media Stack Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📺</text></svg>">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #475569;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 1.8em;
-        }
-        
-        .service {
-            margin-bottom: 15px;
-        }
-        
-        .service-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             transition: all 0.3s ease;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
             border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
         }
-        
-        .service-button:hover, .service-button:active {
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .service-card {
+            position: relative;
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .service-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
         }
-        
-        .hostname-info {
-            background: #e3f2fd;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #333;
+
+        .service-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
         }
-        
-        .hostname-info strong {
-            color: #1976d2;
+
+        .service-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .service-url {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            word-break: break-all;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success-color);
+        }
+
+        .status-indicator.checking {
+            background: var(--warning-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.error {
+            background: var(--error-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .system-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-card {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-1px);
+        }
+
+        .status-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .status-count.online { color: var(--success-color); }
+        .status-count.checking { color: var(--warning-color); }
+        .status-count.offline { color: var(--error-color); }
+
+        .status-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-info {
+                align-items: center;
+            }
+
+            .container {
+                padding: 0 1rem 1rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+
+            .system-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid var(--text-secondary);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <h1>📺 Media Stack Dashboard</h1>
+            <div class="header-info">
+                <div>Server: <strong id="hostname">192.168.86.111</strong></div>
+                <div>Last Updated: <span id="last-updated">Loading...</span></div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+        </div>
+    </header>
+
     <div class="container">
-        <h1>🎬 Media Server</h1>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:8096" class="service-button">
-                🎥 Jellyfin
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:5055" class="service-button">
-                🎬 Jellyseerr
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:8989" class="service-button">
-                📺 Sonarr
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:7878" class="service-button">
-                🎞️ Radarr
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:9696" class="service-button">
-                🔍 Prowlarr
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:6767" class="service-button">
-                📝 Bazarr
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:8080" class="service-button">
-                ⬇️ qBittorrent
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:8090" class="service-button">
-                🚦 Traefik
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:3001" class="service-button">
-                📊 Grafana
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:9090" class="service-button">
-                📈 Prometheus
-            </a>
-        </div>
-        
-        <div class="service">
-            <a href="http://192.168.86.111:8081" class="service-button">
-                🖥️ cAdvisor
-            </a>
-        </div>
-        
-        <div class="hostname-info">
-            <strong>Alternative URLs:</strong><br>
-            Try using <strong>dell-optiplex-3040.local</strong> instead of the IP address if your device supports mDNS.
+        <div class="dashboard-grid">
+            <!-- Media Services Section -->
+            <section class="section">
+                <h2 class="section-title">🎬 Media Services</h2>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-count online" id="media-online">0</span>
+                        <div class="status-label">Online</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count checking" id="media-checking">4</span>
+                        <div class="status-label">Checking</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count offline" id="media-offline">0</span>
+                        <div class="status-label">Offline</div>
+                    </div>
+                </div>
+                <div class="services-grid">
+                    <a href="http://192.168.86.111:8096" class="service-card" data-service="jellyfin" data-port="8096">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🎥</div>
+                        <div class="service-name">Jellyfin</div>
+                        <div class="service-url">:8096</div>
+                    </a>
+                    <a href="http://192.168.86.111:5055" class="service-card" data-service="jellyseerr" data-port="5055">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🎬</div>
+                        <div class="service-name">Jellyseerr</div>
+                        <div class="service-url">:5055</div>
+                    </a>
+                    <a href="http://192.168.86.111:8989" class="service-card" data-service="sonarr" data-port="8989">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">📺</div>
+                        <div class="service-name">Sonarr</div>
+                        <div class="service-url">:8989</div>
+                    </a>
+                    <a href="http://192.168.86.111:7878" class="service-card" data-service="radarr" data-port="7878">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🎞️</div>
+                        <div class="service-name">Radarr</div>
+                        <div class="service-url">:7878</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Download & Indexing Section -->
+            <section class="section">
+                <h2 class="section-title">⬇️ Download & Indexing</h2>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-count online" id="download-online">0</span>
+                        <div class="status-label">Online</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count checking" id="download-checking">3</span>
+                        <div class="status-label">Checking</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count offline" id="download-offline">0</span>
+                        <div class="status-label">Offline</div>
+                    </div>
+                </div>
+                <div class="services-grid">
+                    <a href="http://192.168.86.111:9696" class="service-card" data-service="prowlarr" data-port="9696">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🔍</div>
+                        <div class="service-name">Prowlarr</div>
+                        <div class="service-url">:9696</div>
+                    </a>
+                    <a href="http://192.168.86.111:6767" class="service-card" data-service="bazarr" data-port="6767">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">📝</div>
+                        <div class="service-name">Bazarr</div>
+                        <div class="service-url">:6767</div>
+                    </a>
+                    <a href="http://192.168.86.111:8080" class="service-card" data-service="qbittorrent" data-port="8080">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">⬇️</div>
+                        <div class="service-name">qBittorrent</div>
+                        <div class="service-url">:8080</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Infrastructure Section -->
+            <section class="section">
+                <h2 class="section-title">🛠️ Infrastructure</h2>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-count online" id="infra-online">0</span>
+                        <div class="status-label">Online</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count checking" id="infra-checking">2</span>
+                        <div class="status-label">Checking</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count offline" id="infra-offline">0</span>
+                        <div class="status-label">Offline</div>
+                    </div>
+                </div>
+                <div class="services-grid">
+                    <a href="http://192.168.86.111:8090" class="service-card" data-service="traefik" data-port="8090">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🚦</div>
+                        <div class="service-name">Traefik</div>
+                        <div class="service-url">:8090</div>
+                    </a>
+                    <a href="http://192.168.86.111:3000" class="service-card" data-service="dashboard" data-port="3000">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">📊</div>
+                        <div class="service-name">Dashboard</div>
+                        <div class="service-url">:3000</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Monitoring Section -->
+            <section class="section">
+                <h2 class="section-title">📊 Monitoring</h2>
+                <div class="status-summary">
+                    <div class="status-item">
+                        <span class="status-count online" id="monitoring-online">0</span>
+                        <div class="status-label">Online</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count checking" id="monitoring-checking">3</span>
+                        <div class="status-label">Checking</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-count offline" id="monitoring-offline">0</span>
+                        <div class="status-label">Offline</div>
+                    </div>
+                </div>
+                <div class="services-grid">
+                    <a href="http://192.168.86.111:3001" class="service-card" data-service="grafana" data-port="3001">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">📈</div>
+                        <div class="service-name">Grafana</div>
+                        <div class="service-url">:3001</div>
+                    </a>
+                    <a href="http://192.168.86.111:9090" class="service-card" data-service="prometheus" data-port="9090">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">📊</div>
+                        <div class="service-name">Prometheus</div>
+                        <div class="service-url">:9090</div>
+                    </a>
+                    <a href="http://192.168.86.111:8081" class="service-card" data-service="cadvisor" data-port="8081">
+                        <div class="status-indicator checking"></div>
+                        <div class="service-icon">🖥️</div>
+                        <div class="service-name">cAdvisor</div>
+                        <div class="service-url">:8081</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- System Information -->
+            <section class="section">
+                <h2 class="section-title">💻 System Information</h2>
+                <div class="system-info">
+                    <div class="info-card">
+                        <div class="info-label">Hostname</div>
+                        <div class="info-value">dell-optiplex-3040</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">IP Address</div>
+                        <div class="info-value">192.168.86.111</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">Services Running</div>
+                        <div class="info-value"><span id="total-services">12</span> Total</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">mDNS Address</div>
+                        <div class="info-value">dell-optiplex-3040.local</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="section">
+                <h2 class="section-title">⚡ Quick Actions</h2>
+                <div class="quick-actions">
+                    <button class="action-btn" onclick="checkAllServices()">🔄 Refresh Status</button>
+                    <a href="http://192.168.86.111:8096" class="action-btn">🎬 Open Jellyfin</a>
+                    <a href="http://192.168.86.111:5055" class="action-btn">📋 Request Media</a>
+                    <a href="http://192.168.86.111:8080" class="action-btn">⬇️ Downloads</a>
+                    <a href="http://192.168.86.111:3001" class="action-btn">📊 Monitoring</a>
+                </div>
+            </section>
         </div>
     </div>
+
+    <footer class="footer">
+        <div>Media Stack Dashboard | Last checked: <span id="footer-last-updated">--</span></div>
+        <div>Try using <strong>dell-optiplex-3040.local</strong> if your device supports mDNS</div>
+    </footer>
+
+    <script>
+        // Theme management
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const themeToggle = document.querySelector('.theme-toggle');
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            const themeToggle = document.querySelector('.theme-toggle');
+            themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Service status checking
+        async function checkServiceStatus(serviceCard) {
+            const service = serviceCard.getAttribute('data-service');
+            const port = serviceCard.getAttribute('data-port');
+            const indicator = serviceCard.querySelector('.status-indicator');
+            
+            indicator.className = 'status-indicator checking';
+            
+            try {
+                const response = await fetch(`/api/health/${service}`);
+                const data = await response.json();
+                
+                if (data.success && data.online) {
+                    indicator.className = 'status-indicator';
+                    return true;
+                } else {
+                    indicator.className = 'status-indicator error';
+                    return false;
+                }
+            } catch (error) {
+                console.error(`Failed to check ${service}:`, error);
+                indicator.className = 'status-indicator error';
+                return false;
+            }
+        }
+
+        async function checkAllServicesViaAPI() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update service indicators based on API response
+                    Object.entries(data.services).forEach(([serviceId, serviceData]) => {
+                        const serviceCard = document.querySelector(`[data-service="${serviceId}"]`);
+                        if (serviceCard) {
+                            const indicator = serviceCard.querySelector('.status-indicator');
+                            indicator.className = `status-indicator ${serviceData.online ? '' : 'error'}`;
+                        }
+                    });
+                    
+                    updateStatusCounts();
+                    updateLastChecked();
+                    
+                    return data;
+                } else {
+                    throw new Error('API health check failed');
+                }
+            } catch (error) {
+                console.error('Failed to check services via API:', error);
+                // Fallback to individual checks
+                return await fallbackServiceCheck();
+            }
+        }
+
+        async function fallbackServiceCheck() {
+            const serviceCards = document.querySelectorAll('.service-card');
+            const checks = Array.from(serviceCards).map(card => updateServiceStatus(card));
+            await Promise.all(checks);
+            updateStatusCounts();
+            updateLastChecked();
+        }
+
+        async function updateServiceStatus(serviceCard) {
+            return await checkServiceStatus(serviceCard);
+        }
+
+        async function checkAllServices() {
+            const checkButton = document.querySelector('.action-btn');
+            
+            checkButton.innerHTML = '<div class="loading"></div> Checking...';
+            checkButton.disabled = true;
+            
+            // Reset all to checking state
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                const indicator = card.querySelector('.status-indicator');
+                indicator.className = 'status-indicator checking';
+            });
+            
+            updateStatusCounts();
+            
+            // Try API-based check first, fallback to individual checks
+            try {
+                await checkAllServicesViaAPI();
+            } catch (error) {
+                console.error('API check failed, using fallback:', error);
+                await fallbackServiceCheck();
+            }
+            
+            checkButton.innerHTML = '🔄 Refresh Status';
+            checkButton.disabled = false;
+        }
+
+        // Load system information
+        async function loadSystemInfo() {
+            try {
+                const response = await fetch('/api/system');
+                const data = await response.json();
+                
+                if (data.hostname) {
+                    document.getElementById('hostname').textContent = data.hostname;
+                }
+                
+                // Update hostname in info cards if needed
+                const hostnameCards = document.querySelectorAll('.info-value');
+                hostnameCards.forEach(card => {
+                    if (card.textContent === 'dell-optiplex-3040' && data.hostname) {
+                        card.textContent = data.hostname;
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Failed to load system info:', error);
+            }
+        }
+
+        function updateStatusCounts() {
+            const sections = ['media', 'download', 'infra', 'monitoring'];
+            
+            sections.forEach(section => {
+                const sectionElement = document.querySelector(`#${section}-online`).closest('.section');
+                const serviceCards = sectionElement.querySelectorAll('.service-card');
+                
+                let online = 0, checking = 0, offline = 0;
+                
+                serviceCards.forEach(card => {
+                    const indicator = card.querySelector('.status-indicator');
+                    if (indicator.classList.contains('checking')) {
+                        checking++;
+                    } else if (indicator.classList.contains('error')) {
+                        offline++;
+                    } else {
+                        online++;
+                    }
+                });
+                
+                document.getElementById(`${section}-online`).textContent = online;
+                document.getElementById(`${section}-checking`).textContent = checking;
+                document.getElementById(`${section}-offline`).textContent = offline;
+            });
+        }
+
+        function updateLastChecked() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('last-updated').textContent = timeString;
+            document.getElementById('footer-last-updated').textContent = timeString;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            updateLastChecked();
+            loadSystemInfo();
+            
+            // Auto-check services on load
+            setTimeout(checkAllServices, 1000);
+            
+            // Auto-refresh every 5 minutes
+            setInterval(checkAllServices, 5 * 60 * 1000);
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,17 @@
+{
+  "name": "media-dashboard-api",
+  "version": "1.0.0",
+  "description": "Health check API for media stack dashboard",
+  "main": "health-api.js",
+  "scripts": {
+    "start": "node health-api.js",
+    "dev": "nodemon health-api.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
