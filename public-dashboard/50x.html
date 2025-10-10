@@ -3,43 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Service Unavailable</title>
+    <title>ERROR - Service Unavailable</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
         :root {
-            color-scheme: light dark;
+            --win95-gray: #c0c0c0;
+            --win95-dark-gray: #808080;
+            --win95-light-gray: #dfdfdf;
+            --win95-white: #ffffff;
+            --win95-black: #000000;
+            --win95-blue: #000080;
+            --desktop-bg: #008080;
+            --text-primary: #000000;
+            --text-secondary: #ffffff;
+            --offline: #ff0000;
+            --shadow-dark: #000000;
+            --shadow-light: #ffffff;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+            font-family: 'Press Start 2P', 'Courier New', monospace;
+            background: var(--desktop-bg);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            padding: 24px;
+            padding: 20px;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15) 0px,
+                    transparent 1px,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 3px
+                );
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .crt-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.3) 100%);
+            z-index: 9998;
         }
 
         .panel {
-            background: rgba(255, 255, 255, 0.96);
-            border-radius: 18px;
-            padding: 40px;
-            max-width: 420px;
+            background: var(--win95-gray);
+            border-top: 2px solid var(--shadow-light);
+            border-left: 2px solid var(--shadow-light);
+            border-right: 2px solid var(--shadow-dark);
+            border-bottom: 2px solid var(--shadow-dark);
+            padding: 20px;
+            max-width: 500px;
             width: 100%;
-            box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
             text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .window-title-bar {
+            background: linear-gradient(90deg, var(--win95-blue) 0%, #000080 100%);
+            color: var(--text-secondary);
+            padding: 4px 6px;
+            margin: -20px -20px 16px -20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 4px;
+        }
+
+        .window-button {
+            width: 18px;
+            height: 18px;
+            background: var(--win95-gray);
+            border-top: 1px solid var(--shadow-light);
+            border-left: 1px solid var(--shadow-light);
+            border-right: 1px solid var(--shadow-dark);
+            border-bottom: 1px solid var(--shadow-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0.3; }
         }
 
         .panel h1 {
-            font-size: 1.75rem;
-            color: #1e293b;
-            margin-bottom: 12px;
+            font-size: clamp(10px, 3vw, 14px);
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .panel p {
-            color: #475569;
-            line-height: 1.6;
-            margin-bottom: 24px;
+            color: var(--text-primary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: clamp(7px, 2vw, 9px);
+        }
+
+        .error-code {
+            background: var(--offline);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            margin-bottom: 16px;
+            font-size: clamp(8px, 2vw, 10px);
+            border-top: 1px solid var(--shadow-light);
+            border-left: 1px solid var(--shadow-light);
+            border-right: 1px solid var(--shadow-dark);
+            border-bottom: 1px solid var(--shadow-dark);
         }
 
         .actions {
@@ -51,40 +169,83 @@
 
         .actions a {
             text-decoration: none;
-            font-weight: 600;
-            border-radius: 999px;
-            padding: 10px 22px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 400;
+            padding: 10px 20px;
+            transition: none;
+            font-size: clamp(6px, 1.5vw, 8px);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .actions a.primary {
-            background: #2563eb;
-            color: #f8fafc;
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+            background: var(--win95-gray);
+            color: var(--text-primary);
+            border-top: 2px solid var(--shadow-light);
+            border-left: 2px solid var(--shadow-light);
+            border-right: 2px solid var(--shadow-dark);
+            border-bottom: 2px solid var(--shadow-dark);
         }
 
         .actions a.primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 16px 28px rgba(37, 99, 235, 0.28);
+            background: var(--win95-light-gray);
+        }
+
+        .actions a.primary:active {
+            border-top: 2px solid var(--shadow-dark);
+            border-left: 2px solid var(--shadow-dark);
+            border-right: 2px solid var(--shadow-light);
+            border-bottom: 2px solid var(--shadow-light);
         }
 
         .actions a.secondary {
-            background: rgba(148, 163, 184, 0.18);
-            color: #1e293b;
+            background: var(--win95-dark-gray);
+            color: var(--text-secondary);
+            border-top: 2px solid var(--shadow-light);
+            border-left: 2px solid var(--shadow-light);
+            border-right: 2px solid var(--shadow-dark);
+            border-bottom: 2px solid var(--shadow-dark);
         }
 
         .actions a.secondary:hover {
-            transform: translateY(-1px);
+            background: #909090;
+        }
+
+        .actions a.secondary:active {
+            border-top: 2px solid var(--shadow-dark);
+            border-left: 2px solid var(--shadow-dark);
+            border-right: 2px solid var(--shadow-light);
+            border-bottom: 2px solid var(--shadow-light);
+        }
+
+        @media (max-width: 480px) {
+            .window-title-bar {
+                font-size: 8px;
+            }
+            .panel h1 {
+                font-size: 10px;
+            }
+            .panel p {
+                font-size: 7px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="crt-effect"></div>
     <div class="panel">
-        <h1>We're working on it</h1>
-        <p>The status dashboard is temporarily unavailable. Try refreshing or come back in a few moments while we restore service.</p>
+        <div class="window-title-bar">
+            <span>SYSTEM ERROR</span>
+            <div class="window-controls">
+                <div class="window-button">X</div>
+            </div>
+        </div>
+        <div class="error-icon">⚠️</div>
+        <div class="error-code">ERROR 503: SERVICE UNAVAILABLE</div>
+        <h1>System Temporarily Offline</h1>
+        <p>The status dashboard is currently unavailable. Please try refreshing the page or return in a few moments while we restore service.</p>
         <div class="actions">
-            <a class="primary" href="/index.html">Go to Dashboard</a>
-            <a class="secondary" href="javascript:location.reload()">Refresh</a>
+            <a class="primary" href="/index.html">Return to Dashboard</a>
+            <a class="secondary" href="javascript:location.reload()">Refresh Page</a>
         </div>
     </div>
 </body>
