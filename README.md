@@ -77,3 +77,33 @@ docker exec fail2ban fail2ban-client set traefik-auth unbanip <IP_ADDRESS>
 
 For detailed configuration and usage, see `fail2ban/README.md`.
 
+## VPN Protection for qBittorrent
+
+This stack includes Gluetun VPN integration to protect qBittorrent torrent traffic through Mullvad WireGuard.
+
+### Features
+
+- All torrent traffic routed through encrypted VPN tunnel
+- Automatic killswitch prevents IP leaks
+- Port forwarding support for better seeding
+- Other services (Jellyfin, Sonarr, Radarr) bypass VPN for better performance
+
+### Quick Setup
+
+1. Sign up for [Mullvad VPN](https://mullvad.net/)
+2. Generate WireGuard credentials in your Mullvad account
+3. Add credentials to `.env` file:
+   ```bash
+   WIREGUARD_PRIVATE_KEY=your_private_key
+   WIREGUARD_ADDRESSES=10.x.x.x/32
+   ```
+4. Start the services:
+   ```bash
+   cd qbittorrent
+   docker-compose up -d
+   ```
+
+For detailed setup instructions, see [SETUP-VPN.md](./docs/SETUP-VPN.md).
+
+For architecture details, see [VPN-ARCHITECTURE.md](./docs/VPN-ARCHITECTURE.md).
+

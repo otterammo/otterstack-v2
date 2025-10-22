@@ -3,10 +3,9 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     restart: unless-stopped
-    ports:
-      - "8080:8080"
-      - "6881:6881"
-      - "6881:6881/udp"
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
     volumes:
       - ./qbittorrent/config:/config
       - ${DOWNLOADS_PATH:-/mnt/external/downloads}:/downloads
@@ -22,14 +21,42 @@ services:
           memory: 4G
         reservations:
           memory: 512M
+
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_PROVIDER:-mullvad}
+      - VPN_TYPE=${VPN_TYPE:-wireguard}
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - SERVER_CITIES=${VPN_SERVER_CITIES:-Chicago}
+      - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.18.0.0/16,192.168.1.0/24}
+      - FIREWALL_VPN_INPUT_PORTS=${VPN_INPUT_PORTS:-6881}
+      - TZ=${TZ:-UTC}
+      - HTTPPROXY=off
+      - SHADOWSOCKS=off
+      - HEALTH_VPN_DURATION_INITIAL=20s
+      - HEALTH_VPN_DURATION_ADDITION=10s
+    volumes:
+      - ./gluetun:/gluetun
     networks:
       - media-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080"]
-      interval: 30s
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9999/v1/openvpn/status"]
+      interval: 60s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 30s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.local}`)"
