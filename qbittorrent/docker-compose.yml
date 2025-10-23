@@ -52,7 +52,7 @@ services:
     networks:
       - media-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9999/v1/openvpn/status"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9999"]
       interval: 60s
       timeout: 10s
       retries: 3

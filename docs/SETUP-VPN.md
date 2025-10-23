@@ -261,6 +261,51 @@ If Gluetun or qBittorrent keeps restarting:
    docker exec gluetun env | grep -E "VPN|WIREGUARD"
    ```
 
+### WireGuard Connects But No Traffic Flows
+
+**Symptoms:**
+- Gluetun logs show "Wireguard setup is complete"
+- Tunnel interface `tun0` exists with an IP address
+- DNS lookups fail with "i/o timeout"
+- `docker exec gluetun wget -qO- https://api.ipify.org` times out
+- Continuous healthcheck failures
+
+**Diagnosis:**
+```bash
+# Check if tunnel interface exists
+docker exec gluetun ip addr show tun0
+
+# Try to get public IP (will timeout if not working)
+timeout 8 docker exec gluetun wget -qO- https://api.ipify.org
+```
+
+**Solution - Wrong Private Key:**
+The private key displayed in the Mullvad web console is **different** from the actual private key in the downloaded WireGuard config files!
+
+1. Go to https://mullvad.net/en/account/wireguard-config
+2. Download the WireGuard configuration (don't just copy from the web page)
+3. Extract the downloaded archive (`.zip` or `.conf` file)
+4. Open the config file and find the **actual** `PrivateKey` value
+5. Update your `.env` file with this private key:
+   ```bash
+   WIREGUARD_PRIVATE_KEY='<key from config file>'
+   ```
+6. Recreate the container:
+   ```bash
+   docker compose down gluetun
+   docker compose up -d gluetun
+   ```
+7. Verify connection:
+   ```bash
+   docker exec gluetun wget -qO- https://api.ipify.org
+   # Should return Mullvad IP address
+   ```
+
+**Other Possible Causes:**
+- Mullvad account expired (check time remaining)
+- WireGuard key not activated (wait 60 seconds after generation)
+- Payment issue or account suspended
+
 ## Rolling Back
 
 If you need to revert to direct connection:
