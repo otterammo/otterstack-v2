@@ -9,6 +9,7 @@ include:
   - qbittorrent/docker-compose.yml
   - cloudflared/docker-compose.yml
   - monitoring/docker-compose.yml
+  - dozzle/docker-compose.yml
 
 networks:
   media-network:

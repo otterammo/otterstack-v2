@@ -18,7 +18,8 @@ const services = {
     traefik: { port: 8090, name: 'Traefik' },
     grafana: { port: 3001, name: 'Grafana' },
     prometheus: { port: 9090, name: 'Prometheus' },
-    cadvisor: { port: 8081, name: 'cAdvisor' }
+    cadvisor: { port: 8081, name: 'cAdvisor' },
+    dozzle: { port: 9999, name: 'Dozzle' }
 };
 
 // Check if a port is open
