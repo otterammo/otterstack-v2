@@ -1,0 +1,7 @@
+# Public Assets
+
+Place static files in this directory to serve them from the root URL path.
+
+For example:
+- `/public/favicon.ico` → accessible at `/favicon.ico`
+- `/public/logo.png` → accessible at `/logo.png`

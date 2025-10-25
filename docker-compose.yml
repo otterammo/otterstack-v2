@@ -1,8 +1,7 @@
 include:
   - traefik/docker-compose.yml
   - fail2ban/docker-compose.yml
-  - dashboard/docker-compose.yml
-  - public-dashboard/docker-compose.yml
+  - web-ui/docker-compose.yml
   - jellyfin/docker-compose.yml
   - jellyseerr/docker-compose.yml
   - servarr/docker-compose.yml
