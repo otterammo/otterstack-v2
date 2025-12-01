@@ -1,4 +1,4 @@
-# Media Stack
+![otterstack](assets/otterstack.png)
 
 A Docker-based media management solution with automated deployment and management tools.
 
