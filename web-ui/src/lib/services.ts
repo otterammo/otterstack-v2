@@ -122,5 +122,21 @@ export const SERVICES: Service[] = [
   },
 ]
 
-export const PUBLIC_SERVICES = SERVICES.filter(s => s.category === 'public')
-export const ADMIN_SERVICES = SERVICES.filter(s => s.category !== 'public')
+export const PUBLIC_SERVICES = SERVICES.filter((s) => s.category === 'public')
+
+const ADMIN_PUBLIC_SERVICE_OVERRIDES: Record<string, Pick<Service, 'category'>> = {
+  jellyfin: { category: 'media' },
+  jellyseerr: { category: 'media' },
+}
+
+const adminPublicServices = SERVICES
+  .filter((service) => ADMIN_PUBLIC_SERVICE_OVERRIDES[service.id])
+  .map((service) => ({
+    ...service,
+    ...ADMIN_PUBLIC_SERVICE_OVERRIDES[service.id],
+  }))
+
+export const ADMIN_SERVICES = [
+  ...SERVICES.filter((s) => s.category !== 'public'),
+  ...adminPublicServices,
+]

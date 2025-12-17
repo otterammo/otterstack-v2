@@ -7,9 +7,14 @@ import { getServiceDisplayUrl } from '@/lib/serviceUrls'
 interface ServiceCardProps {
   service: Service
   showCategory?: boolean
+  preferLocalUrl?: boolean
 }
 
-export default function ServiceCard({ service, showCategory = false }: ServiceCardProps) {
+export default function ServiceCard({
+  service,
+  showCategory = false,
+  preferLocalUrl = false,
+}: ServiceCardProps) {
   const [status, setStatus] = useState<ServiceStatus>({
     id: service.id,
     status: 'checking',
@@ -48,7 +53,7 @@ export default function ServiceCard({ service, showCategory = false }: ServiceCa
     checking: 'Checking...',
   }
 
-  const displayUrl = getServiceDisplayUrl(service)
+  const displayUrl = getServiceDisplayUrl(service, { preferLocalUrl })
 
   return (
     <a

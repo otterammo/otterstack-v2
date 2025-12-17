@@ -61,7 +61,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.media.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard key={service.id} service={service} preferLocalUrl />
             ))}
           </div>
         </section>
@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.download.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard key={service.id} service={service} preferLocalUrl />
             ))}
           </div>
         </section>
@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.infrastructure.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard key={service.id} service={service} preferLocalUrl />
             ))}
           </div>
         </section>
@@ -97,7 +97,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.monitoring.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+              <ServiceCard key={service.id} service={service} preferLocalUrl />
             ))}
           </div>
         </section>
