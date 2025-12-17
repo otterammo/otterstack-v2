@@ -65,6 +65,9 @@ Port forwarding improves seeding performance by allowing incoming connections:
    # Otherwise, leave as 6881
    VPN_INPUT_PORTS=6881
    
+   # Allow LAN/Docker access to the qBittorrent WebUI through Gluetun
+   FIREWALL_INPUT_PORTS=8080
+   
    # Update these subnets if your network differs
    FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
    ```

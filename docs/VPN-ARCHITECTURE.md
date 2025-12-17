@@ -577,6 +577,16 @@ The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to
 FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
 ```
 
+#### Firewall Input Ports (LAN / Docker access)
+
+The Gluetun killswitch blocks all inbound traffic by default, including connections from the host or other containers on the Docker bridge. To reach the qBittorrent WebUI (on port 8080) you must explicitly permit that port:
+
+```
+FIREWALL_INPUT_PORTS=8080
+```
+
+This keeps torrent peer traffic restricted to the VPN (still controlled by `FIREWALL_VPN_INPUT_PORTS`) while allowing local health checks, Traefik, and administrators to reach the WebUI through the host.
+
 ---
 
 ## Failure Scenarios
