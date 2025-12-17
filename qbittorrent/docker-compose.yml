@@ -45,8 +45,10 @@ services:
       - TZ=${TZ:-UTC}
       - HTTPPROXY=off
       - SHADOWSOCKS=off
-      - HEALTH_VPN_DURATION_INITIAL=20s
-      - HEALTH_VPN_DURATION_ADDITION=10s
+      - DOT=${GLUETUN_DOT:-on}
+      - DOT_PROVIDERS=${GLUETUN_DOT_PROVIDERS:-quad9,cloudflare}
+      - HEALTH_TARGET_ADDRESS=${GLUETUN_HEALTH_TARGET_ADDRESS:-1.1.1.1:443}
+      - HEALTH_TARGET_ADDRESS_FALLBACK=${GLUETUN_HEALTH_TARGET_FALLBACKS:-cloudflare-dns.com:443,quad9.net:443}
     volumes:
       - ./gluetun:/gluetun
     networks:
