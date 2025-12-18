@@ -423,8 +423,8 @@ Response: {"hash": "abc123...", "status": "downloading"}
 | Port | Protocol | Container | Purpose | Exposed To |
 |------|----------|-----------|---------|------------|
 | 8080 | TCP | Gluetun | qBittorrent WebUI | Host + LAN |
-| 6881 | TCP | Gluetun | Torrent incoming | Internet (VPN) |
-| 6881 | UDP | Gluetun | Torrent incoming | Internet (VPN) |
+| VPN_INPUT_PORTS (default 6881) | TCP | Gluetun | Torrent incoming | Internet (VPN) |
+| VPN_INPUT_PORTS (default 6881) | UDP | Gluetun | Torrent incoming | Internet (VPN) |
 | 8888 | TCP | Gluetun | HTTP proxy | Optional |
 | 8388 | TCP | Gluetun | Shadowsocks | Disabled |
 
@@ -435,8 +435,8 @@ graph TD
   A["Internet<br/>Torrent Peer"]
   B["Mullvad VPN Server<br/>Port Forwarding Rule"]
   C["WireGuard Tunnel<br/>Encrypted"]
-  D["Gluetun Container<br/>Port 6881"]
-  E["qBittorrent<br/>Listening on 6881"]
+  D["Gluetun Container<br/>Forwarded Port"]
+  E["qBittorrent<br/>Listening on Forwarded Port"]
 
   A -->|External Port<br/>e.g., 51820| B
   B -->|Forwards to<br/>Client Port| C
@@ -453,10 +453,10 @@ graph TD
 
 **Port Forwarding Configuration**:
 - Mullvad provides a random port (e.g., 51820)
-- Configure in Gluetun: `FIREWALL_VPN_INPUT_PORTS=51820`
-- Map in docker-compose: `"51820:6881"`
-- Configure qBittorrent to listen on 6881
-- Result: External peers connect to Mullvad:51820 → reaches qBittorrent:6881
+- Set `.env` → `VPN_INPUT_PORTS=51820` so Gluetun opens that port via `FIREWALL_VPN_INPUT_PORTS`
+- Configure qBittorrent (WebUI or `qBittorrent.conf`) to listen on the same port
+- Re-run `docker compose up -d` so the Gluetun container reloads the updated environment
+- Result: External peers connect to Mullvad:51820 → reaches qBittorrent:51820
 
 ### Traefik Routing
 
@@ -577,15 +577,9 @@ The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to
 FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
 ```
 
-#### Firewall Input Ports (LAN / Docker access)
+#### WebUI Access
 
-The Gluetun killswitch blocks all inbound traffic by default, including connections from the host or other containers on the Docker bridge. To reach the qBittorrent WebUI (on port 8080) you must explicitly permit that port:
-
-```
-FIREWALL_INPUT_PORTS=8080
-```
-
-This keeps torrent peer traffic restricted to the VPN (still controlled by `FIREWALL_VPN_INPUT_PORTS`) while allowing local health checks, Traefik, and administrators to reach the WebUI through the host.
+Port 8080 is published directly on the Gluetun container (`ports: "8080:8080"`), so local administrators, health checks, and Traefik can reach the qBittorrent UI without any additional firewall overrides.
 
 ---
 

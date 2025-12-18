@@ -65,14 +65,15 @@ Port forwarding improves seeding performance by allowing incoming connections:
    # Otherwise, leave as 6881
    VPN_INPUT_PORTS=6881
    
-   # Allow LAN/Docker access to the qBittorrent WebUI through Gluetun
-   FIREWALL_INPUT_PORTS=8080
-   
    # Update these subnets if your network differs
    FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
    ```
 
-3. Save and close the file
+3. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
+   ```bash
+   cd /home/otterammo/media
+   docker compose up -d gluetun
+   ```
 
 ## Step 4: Verify Docker Network Subnet
 
@@ -155,9 +156,11 @@ http://qbittorrent.local
 2. Go to Settings → Connection
 
 ### Connection Settings:
-- **Listening Port**: Set to `6881` (or your port forwarding port)
+- **Listening Port**: Set to the same value as `VPN_INPUT_PORTS` in `.env`
 - **Use UPnP / NAT-PMP**: Disable (not needed with port forwarding)
 - **Network Interface**: Leave as default
+
+If you edit settings directly via the config file, update both `Session\Port` and `Preferences.Connection\PortRangeMin` in `qbittorrent/qbittorrent/config/qBittorrent/qBittorrent.conf` so they match the forwarded port, then run `docker compose up -d` again to reload the container.
 
 ### Optional - Check Connection Status:
 You can verify port forwarding is working by checking the connection icon in qBittorrent. A green icon indicates incoming connections are working.
