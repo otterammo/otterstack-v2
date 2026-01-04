@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.6.6
     container_name: traefik
     restart: unless-stopped
     command:
@@ -32,6 +32,7 @@ services:
       - ./logs:/var/log/traefik
     environment:
       - TZ=${TZ:-UTC}
+      - DOCKER_API_VERSION=1.44
     networks:
       - media-network
     healthcheck:
