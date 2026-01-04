@@ -312,6 +312,23 @@ The private key displayed in the Mullvad web console is **different** from the a
 - WireGuard key not activated (wait 60 seconds after generation)
 - Payment issue or account suspended
 
+## Auto-Healing
+
+The compose stack deploys a small [autoheal](https://hub.docker.com/r/willfarrell/autoheal) helper that watches Gluetun's Docker healthcheck. When Gluetun reports itself as `unhealthy`, autoheal issues a `docker restart gluetun`, which also bounces qBittorrent because it shares Gluetun's network namespace.
+
+Useful commands:
+
+```bash
+# Check autoheal status/logs
+docker ps | grep autoheal
+docker logs autoheal --tail=20
+
+# Confirm Gluetun health flag
+docker inspect --format '{{.State.Health.Status}}' gluetun
+```
+
+If you ever need to disable auto-healing, remove the `autoheal` service and the `autoheal=true` label from Gluetun in `qbittorrent/docker-compose.yml`.
+
 ## Rolling Back
 
 If you need to revert to direct connection:
