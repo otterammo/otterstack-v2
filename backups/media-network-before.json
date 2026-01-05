@@ -1,0 +1,167 @@
+[
+    {
+        "Name": "media-network",
+        "Id": "04d4aaddac90f7e2503a9eddf39d6cb633ae5e8c0d104cdc8a875ab4f77128d0",
+        "Created": "2025-10-23T02:21:49.817090369Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.19.0.0/16",
+                    "IPRange": "",
+                    "Gateway": "172.19.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Options": {},
+        "Labels": {
+            "com.docker.compose.config-hash": "99c1d97d90d07aeced91c54fd85f6b008c5d29f2901f75d728d13bb08a87c13a",
+            "com.docker.compose.network": "media-network",
+            "com.docker.compose.project": "media",
+            "com.docker.compose.version": "2.39.4"
+        },
+        "Containers": {
+            "0978cef0e43c019627cbadc82fd98cd820e95658be05ef963c2bf1e72ea83cac": {
+                "Name": "radarr",
+                "EndpointID": "23b39654b37750c40c6af41d9f9a1b3ee9fea7399b9d00e68383f671eede8cb0",
+                "MacAddress": "da:52:e7:2d:7e:63",
+                "IPv4Address": "172.19.0.6/16",
+                "IPv6Address": ""
+            },
+            "21191443fcb9b5061c58a04c29ec7592f7ae98e85edbec3da210d229e28b42aa": {
+                "Name": "prometheus",
+                "EndpointID": "92f9860690c9f15189f687318f247d52b558a20072ce61d3a41c419881470a55",
+                "MacAddress": "6e:da:30:bd:a4:db",
+                "IPv4Address": "172.19.0.9/16",
+                "IPv6Address": ""
+            },
+            "3337664a56f5e981c23808a940f471a2b2244324c1f247172e6b9b5a17fa7855": {
+                "Name": "jellyfin",
+                "EndpointID": "9ba9001533199c859a68c9a7998dbaae6cb3ff612bcbd9735081a9f88ba9ae2d",
+                "MacAddress": "c6:ee:b0:67:b7:90",
+                "IPv4Address": "172.19.0.8/16",
+                "IPv6Address": ""
+            },
+            "3aa9301634d14612a86ad48dc64cc42b9180d156596eb49e550a93cce0d72ddf": {
+                "Name": "node-exporter",
+                "EndpointID": "81cbb39d810d1d29800b12e65be07a1d2de21a5af1b48c7b5ec19a3f03ad4ea7",
+                "MacAddress": "ba:fd:2d:ae:47:76",
+                "IPv4Address": "172.19.0.2/16",
+                "IPv6Address": ""
+            },
+            "5fe3c1af774282f2cd298708206910733b61cf807b40e58c9dcf329354e35d12": {
+                "Name": "prowlarr",
+                "EndpointID": "74bba959c0a87819c2fb9f5471acbfe35b200dbff1cf61355845911c3e0b500b",
+                "MacAddress": "6e:51:56:87:97:34",
+                "IPv4Address": "172.19.0.16/16",
+                "IPv6Address": ""
+            },
+            "67bdaba756d9c314ef985be153dabd414edcc90942c5a3c3429f31e056f16bd8": {
+                "Name": "media-web-ui",
+                "EndpointID": "36b1587f505cd25a42c92e08c0934aff8bc0319922fee1b3d1d48b3961772089",
+                "MacAddress": "9a:67:58:60:e2:21",
+                "IPv4Address": "172.19.0.11/16",
+                "IPv6Address": ""
+            },
+            "69e760d7d58d6fb2d3e6803a6930b42b30c6ee686b56f440ca157ee391188524": {
+                "Name": "sonarr",
+                "EndpointID": "7a984f15b5571c4e7411223725e37c50b6f2a6889d4e42a325a534ffcfcdbcaa",
+                "MacAddress": "be:d8:e1:96:2f:d5",
+                "IPv4Address": "172.19.0.15/16",
+                "IPv6Address": ""
+            },
+            "76a3b067dd9e1f8830a2ea430db04c2e41f86630ba35968db9d83b7570f5bedc": {
+                "Name": "cadvisor",
+                "EndpointID": "fe437e08a3b595e036c172b4916d4e5cca58878d72a409979f985d16afbe107d",
+                "MacAddress": "c6:0b:9e:5c:ac:7a",
+                "IPv4Address": "172.19.0.10/16",
+                "IPv6Address": ""
+            },
+            "77f7b857419323056015560667fb8d110daaa3f89946e7912311339a098f10e7": {
+                "Name": "bazarr",
+                "EndpointID": "c451961365d40c957e9097c418e1915f742152f0bab5ef17268103345b652e7d",
+                "MacAddress": "2e:4b:6e:5b:4b:03",
+                "IPv4Address": "172.19.0.13/16",
+                "IPv6Address": ""
+            },
+            "a3f3e08c95e4b278881ad3ace6ed00f71b8b0a74b1d7a82d09e7b1c6ee6ae38a": {
+                "Name": "grafana",
+                "EndpointID": "6a2ca20f71d5b09dbfcea1c76c3e2e6c7bb503c1cbef6226d0ac138bcff340ba",
+                "MacAddress": "be:0e:51:be:50:42",
+                "IPv4Address": "172.19.0.18/16",
+                "IPv6Address": ""
+            },
+            "b68addaa6468e1b7c2485c5e14939f07ad0f76c668ea19b1f070b69137723bc3": {
+                "Name": "autoheal",
+                "EndpointID": "c86ac18f084665614f44976daf9dba5b5f91d5ac86675c75fac22e22f9106806",
+                "MacAddress": "0a:46:2d:dd:02:8c",
+                "IPv4Address": "172.19.0.4/16",
+                "IPv6Address": ""
+            },
+            "b7fdf9898d2a47edb42af3d304a57671824b7c4586f24c3d02792724b83da786": {
+                "Name": "dozzle",
+                "EndpointID": "cea6524ef67445df659ffa75fc6e41ede93d70d24d96f6d92664cca03c3d5275",
+                "MacAddress": "42:85:15:9a:42:0b",
+                "IPv4Address": "172.19.0.7/16",
+                "IPv6Address": ""
+            },
+            "de1b8f1cb97b5346d8e5b90830d8aa072d9cc75b5d92e497cca513fb981d448e": {
+                "Name": "cloudflared",
+                "EndpointID": "7ac880d8705fffc44a87e50bd06bc15ab5fbcc00db697dcd7161825be133662c",
+                "MacAddress": "fa:3e:b4:88:af:71",
+                "IPv4Address": "172.19.0.3/16",
+                "IPv6Address": ""
+            },
+            "df8a3a7896885b7e6054e93d97576f1a2eca0c46fe645209f51c4a9b415973c2": {
+                "Name": "jellyseerr",
+                "EndpointID": "21b2a4a1af2525e16363f9bd19bc194ddced0995935ade56ba4284db41f61083",
+                "MacAddress": "32:b1:ac:ad:98:18",
+                "IPv4Address": "172.19.0.17/16",
+                "IPv6Address": ""
+            },
+            "e09e1988f7fc26008778f6bfa673e99952a83d810778fc818f66aa38efb46646": {
+                "Name": "alertmanager",
+                "EndpointID": "99501ef3952f2e88f325c4b28d4ed7b7e52bd524262d3cd0ab5bb74b376efe51",
+                "MacAddress": "86:95:84:5a:98:26",
+                "IPv4Address": "172.19.0.5/16",
+                "IPv6Address": ""
+            },
+            "e29e839f9fe663ce81742d4b611f5201d8a8041989e937af0e073fcf4bb36174": {
+                "Name": "gluetun",
+                "EndpointID": "677d3e27b50e1d155086ddd01c8eaf5550f42be1ed0d32988ff21dff8bb39e57",
+                "MacAddress": "da:aa:02:9a:ba:4c",
+                "IPv4Address": "172.19.0.12/16",
+                "IPv6Address": ""
+            },
+            "f7ab355ad56cec33f3c1ee18ac3a6fd39c0bfdd432e5c775bcec88d3705af096": {
+                "Name": "traefik",
+                "EndpointID": "9969119e480fea2c166ceea217d777686a2cb1c18f886fb86fd48af13363cd66",
+                "MacAddress": "a6:34:07:60:b7:cd",
+                "IPv4Address": "172.19.0.14/16",
+                "IPv6Address": ""
+            }
+        },
+        "Status": {
+            "IPAM": {
+                "Subnets": {
+                    "172.19.0.0/16": {
+                        "IPsInUse": 20,
+                        "DynamicIPsAvailable": 65516
+                    }
+                }
+            }
+        }
+    }
+]

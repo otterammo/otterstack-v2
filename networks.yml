@@ -1,0 +1,38 @@
+# networks.yml - Segmented Network Architecture for Iteration 1
+# This file defines 6 new networks plus the legacy media-network
+
+networks:
+  # Existing network (keep for backward compatibility during transition)
+  media-network:
+    name: ${NETWORK_NAME:-media-network}
+    driver: bridge
+
+  # DMZ - External-facing ingress layer
+  # Services: Traefik, Cloudflared
+  dmz-net:
+    external: true
+
+  # Frontend - User-facing application services
+  # Services: Jellyfin, Jellyseerr, Web UI, Grafana
+  frontend-net:
+    external: true
+
+  # Backend - Business logic and automation services
+  # Services: Sonarr, Radarr, Prowlarr, Bazarr, Jellyseerr (API access)
+  backend-net:
+    external: true
+
+  # Download - VPN-routed download services
+  # Services: Gluetun, qBittorrent (via Gluetun), Sonarr, Radarr, Prowlarr
+  download-net:
+    external: true
+
+  # Management - Infrastructure and monitoring services
+  # Services: Prometheus, Grafana, cAdvisor, Node Exporter, Alertmanager, Dozzle, Autoheal
+  mgmt-net:
+    external: true
+
+  # Security - Security and authentication services (future: Authelia, fail2ban)
+  # Note: fail2ban currently uses host network, will be migrated in later iteration
+  security-net:
+    external: true

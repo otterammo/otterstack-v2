@@ -20,9 +20,7 @@ services:
         reservations:
           memory: 256M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - backend-net       # Business logic layer
-      - download-net      # Connect to qBittorrent
+      - media-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
       interval: 30s
@@ -56,9 +54,7 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - backend-net       # Business logic layer
-      - download-net      # Connect to qBittorrent
+      - media-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
       interval: 30s
@@ -90,9 +86,7 @@ services:
         reservations:
           memory: 64M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - backend-net       # Business logic layer
-      - download-net      # Connect to qBittorrent
+      - media-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
       interval: 30s
@@ -126,8 +120,7 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - backend-net       # Business logic layer
+      - media-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
       interval: 30s

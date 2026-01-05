@@ -9,8 +9,7 @@ services:
       - TZ=${TZ:-UTC}
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - dmz-net           # DMZ network with Traefik
+      - media-network
     depends_on:
       - traefik
     labels:

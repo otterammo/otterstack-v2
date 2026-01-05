@@ -18,9 +18,7 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - frontend-net      # User interface
-      - backend-net       # API calls to Sonarr/Radarr
+      - media-network
     depends_on:
       - jellyfin
     healthcheck:

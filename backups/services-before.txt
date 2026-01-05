@@ -1,0 +1,20 @@
+NAME            IMAGE                                    COMMAND                  SERVICE         CREATED        STATUS                 PORTS
+alertmanager    prom/alertmanager:latest                 "/bin/alertmanager -…"   alertmanager    6 hours ago    Up 6 hours (healthy)   0.0.0.0:9093->9093/tcp, [::]:9093->9093/tcp
+autoheal        willfarrell/autoheal:latest              "/docker-entrypoint …"   autoheal        6 hours ago    Up 6 hours (healthy)   
+bazarr          linuxserver/bazarr:latest                "/init"                  bazarr          6 hours ago    Up 6 hours (healthy)   0.0.0.0:6767->6767/tcp, [::]:6767->6767/tcp
+cadvisor        gcr.io/cadvisor/cadvisor:v0.47.0         "/usr/bin/cadvisor -…"   cadvisor        6 hours ago    Up 6 hours (healthy)   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp
+cloudflared     cloudflare/cloudflared:latest            "cloudflared --no-au…"   cloudflared     2 months ago   Up 4 days              
+dozzle          amir20/dozzle:latest                     "/dozzle"                dozzle          6 hours ago    Up 6 hours (healthy)   0.0.0.0:9999->8080/tcp, [::]:9999->8080/tcp
+fail2ban        crazymax/fail2ban:latest                 "/entrypoint.sh fail…"   fail2ban        6 hours ago    Up 6 hours (healthy)   
+gluetun         qmcgaw/gluetun:latest                    "/gluetun-entrypoint"    gluetun         4 days ago     Up 4 days (healthy)    0.0.0.0:6881->6881/tcp, [::]:6881->6881/tcp, 8000/tcp, 8388/tcp, 0.0.0.0:8080->8080/tcp, 0.0.0.0:6881->6881/udp, [::]:8080->8080/tcp, [::]:6881->6881/udp, 8888/tcp, 8388/udp
+grafana         grafana/grafana:latest                   "/run.sh"                grafana         6 hours ago    Up 6 hours (healthy)   0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+jellyfin        jellyfin/jellyfin:latest                 "/jellyfin/jellyfin"     jellyfin        6 hours ago    Up 6 hours (healthy)   0.0.0.0:1900->1900/udp, [::]:1900->1900/udp, 0.0.0.0:8096->8096/tcp, [::]:8096->8096/tcp, 0.0.0.0:7359->7359/udp, [::]:7359->7359/udp, 0.0.0.0:8920->8920/tcp, [::]:8920->8920/tcp
+jellyseerr      fallenbagel/jellyseerr:latest            "/sbin/tini -- pnpm …"   jellyseerr      6 hours ago    Up 6 hours (healthy)   0.0.0.0:5055->5055/tcp, [::]:5055->5055/tcp
+media-web-ui    media-web-ui                             "docker-entrypoint.s…"   web-ui          6 hours ago    Up 6 hours (healthy)   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+node-exporter   prom/node-exporter:latest                "/bin/node_exporter …"   node-exporter   6 hours ago    Up 6 hours (healthy)   0.0.0.0:9100->9100/tcp, [::]:9100->9100/tcp
+prometheus      prom/prometheus:latest                   "/bin/prometheus --c…"   prometheus      6 hours ago    Up 6 hours (healthy)   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
+prowlarr        linuxserver/prowlarr:latest              "/init"                  prowlarr        6 hours ago    Up 6 hours (healthy)   0.0.0.0:9696->9696/tcp, [::]:9696->9696/tcp
+qbittorrent     lscr.io/linuxserver/qbittorrent:latest   "/init"                  qbittorrent     4 days ago     Up 4 days              
+radarr          linuxserver/radarr:latest                "/init"                  radarr          6 hours ago    Up 6 hours (healthy)   0.0.0.0:7878->7878/tcp, [::]:7878->7878/tcp
+sonarr          linuxserver/sonarr:latest                "/init"                  sonarr          6 hours ago    Up 6 hours (healthy)   0.0.0.0:8989->8989/tcp, [::]:8989->8989/tcp
+traefik         traefik:v3.6.6                           "/entrypoint.sh --pr…"   traefik         6 hours ago    Up 6 hours (healthy)   0.0.0.0:80->80/tcp, [::]:80->80/tcp, 0.0.0.0:8090->8080/tcp, [::]:8090->8080/tcp

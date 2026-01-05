@@ -6,8 +6,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
-      - frontend-net      # User-facing dashboard
+      - media-network
     environment:
       - TZ=${TZ:-UTC}
       - DOMAIN_SUFFIX=${DOMAIN_SUFFIX:-.local}

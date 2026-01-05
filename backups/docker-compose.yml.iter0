@@ -9,4 +9,8 @@ include:
   - servarr/docker-compose.yml
   - traefik/docker-compose.yml
   - web-ui/docker-compose.yml
-  - networks.yml  # Iteration 1: Segmented network architecture
+
+networks:
+  media-network:
+    name: ${NETWORK_NAME:-media-network}
+    driver: bridge

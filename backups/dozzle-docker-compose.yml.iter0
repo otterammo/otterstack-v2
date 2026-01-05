@@ -4,8 +4,7 @@ services:
     container_name: dozzle
     restart: unless-stopped
     networks:
-      - ${NETWORK_NAME:-media-network}  # Keep for backward compatibility (Iteration 1)
-      - mgmt-net                        # Management layer
+      - ${NETWORK_NAME:-media-network}
     ports:
       - "9999:8080"
     volumes:
