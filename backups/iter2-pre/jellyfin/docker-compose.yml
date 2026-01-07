@@ -3,8 +3,11 @@ services:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://jellyfin.local or https://jellyfin.otterammo.xyz
-    # Note: DLNA (1900/udp) and auto-discovery (7359/udp) disabled - configure clients manually
+    ports:
+      - "8096:8096"
+      - "8920:8920" # HTTPS
+      - "7359:7359/udp" # Auto-discovery
+      - "1900:1900/udp" # DLNA
     volumes:
       - ./config:/config
       - ./cache:/cache

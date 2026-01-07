@@ -3,7 +3,8 @@ services:
     image: linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://sonarr.local
+    ports:
+      - "8989:8989"
     volumes:
       - ./sonarr/config:/config
       - ${TV_PATH:-/mnt/external/tv}:/tv
@@ -38,7 +39,8 @@ services:
     image: linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://radarr.local
+    ports:
+      - "7878:7878"
     volumes:
       - ./radarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies
@@ -73,7 +75,8 @@ services:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://prowlarr.local
+    ports:
+      - "9696:9696"
     volumes:
       - ./prowlarr/config:/config
     environment:
@@ -106,7 +109,8 @@ services:
     image: linuxserver/bazarr:latest
     container_name: bazarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://bazarr.local
+    ports:
+      - "6767:6767"
     volumes:
       - ./bazarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies

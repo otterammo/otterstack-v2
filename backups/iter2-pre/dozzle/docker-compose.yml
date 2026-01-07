@@ -6,7 +6,8 @@ services:
     networks:
       - ${NETWORK_NAME:-media-network}  # Keep for backward compatibility (Iteration 1)
       - mgmt-net                        # Management layer
-    # Removed: ports - Access via Traefik at http://dozzle.local
+    ports:
+      - "9999:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:

@@ -32,9 +32,9 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      # Removed: 8080:8080 - qBittorrent WebUI via Traefik at http://qbittorrent.local
-      - "6881:6881"      # BitTorrent traffic (TCP)
-      - "6881:6881/udp"  # BitTorrent traffic (UDP)
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
     environment:
       - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.18.0.0/16,172.20.0.0/16,192.168.1.0/24}
       - FIREWALL_VPN_INPUT_PORTS=${VPN_INPUT_PORTS:-6881}

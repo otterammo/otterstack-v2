@@ -4,7 +4,8 @@ services:
     container_name: prometheus
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://prometheus.local
+    ports:
+      - "9090:9090"
     volumes:
       - ./prometheus/config:/etc/prometheus
       - ./prometheus/data:/prometheus
@@ -49,7 +50,8 @@ services:
     container_name: grafana
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
-    # Removed: ports - Access via Traefik at http://grafana.local
+    ports:
+      - "3001:3000"
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
@@ -89,7 +91,8 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://cadvisor.local
+    ports:
+      - "8081:8080"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -118,7 +121,8 @@ services:
     image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
-    # Removed: ports - Scraped by Prometheus internally via mgmt-net
+    ports:
+      - "9100:9100"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -155,7 +159,8 @@ services:
     container_name: alertmanager
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://alertmanager.local
+    ports:
+      - "9093:9093"
     volumes:
       - ./alertmanager/config:/etc/alertmanager
       - ./alertmanager/data:/alertmanager

@@ -25,9 +25,8 @@ services:
       - "--accesslog.filepath=/var/log/traefik/access.log"
       - "--accesslog.bufferingsize=100"
     ports:
-      - "80:80"       # HTTP entry point
-      - "443:443"     # HTTPS entry point (prepared for Iteration 3)
-      # Removed: 8090:8080 - Dashboard now accessed via Traefik routing
+      - "80:80"       # HTTP
+      - "8090:8080"   # Traefik dashboard (avoiding conflict with qBittorrent)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./logs:/var/log/traefik
@@ -48,6 +47,5 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=web"
-      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
+      - "traefik.http.routers.traefik.service=api@internal"

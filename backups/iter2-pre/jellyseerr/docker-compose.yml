@@ -3,7 +3,8 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://jellyseerr.local or https://jellyseerr.otterammo.xyz
+    ports:
+      - "5055:5055"
     volumes:
       - ./config:/app/config
     environment:

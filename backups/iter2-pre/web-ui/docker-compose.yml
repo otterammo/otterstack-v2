@@ -3,7 +3,8 @@ services:
     build: .
     container_name: media-web-ui
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://dashboard.local or https://otterammo.xyz
+    ports:
+      - "3000:3000"
     networks:
       - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User-facing dashboard

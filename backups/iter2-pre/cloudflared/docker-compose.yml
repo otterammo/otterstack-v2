@@ -1,0 +1,17 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - media-network      # Keep for backward compatibility (Iteration 1)
+      - dmz-net           # DMZ network with Traefik
+    depends_on:
+      - traefik
+    labels:
+      - "traefik.enable=false"  # Cloudflared doesn't need to be exposed through Traefik
