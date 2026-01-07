@@ -39,14 +39,14 @@
 
 ### Option B: Self-Signed (For Local-Only Services)
 
-**For:** `*.local` domains
+**For:** `*.lan` domains
 **Benefits:** Works offline, no external dependencies
 **Drawbacks:** Browser warnings, manual trust
 
 ### Recommended Approach: Hybrid
 
 - **Public services**: Let's Encrypt wildcard cert for `*.otterammo.xyz`
-- **Local services**: Self-signed cert for `*.local`
+- **Local services**: Self-signed cert for `*.lan`
 
 ---
 
@@ -124,7 +124,7 @@ services:
       - "traefik.enable=true"
 
       # Dashboard with HTTPS
-      - "traefik.http.routers.traefik.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
+      - "traefik.http.routers.traefik.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.service=api@internal"
@@ -164,7 +164,7 @@ tls:
 
 ## Generate Self-Signed Certificates
 
-For `*.local` domains:
+For `*.lan` domains:
 
 ```bash
 cd /home/otterammo/media/traefik
@@ -173,13 +173,13 @@ mkdir -p config/certs
 # Generate private key
 openssl genrsa -out config/certs/local-key.pem 2048
 
-# Generate certificate (valid for 1 year, *.local wildcard)
+# Generate certificate (valid for 1 year, *.lan wildcard)
 openssl req -new -x509 -sha256 \
   -key config/certs/local-key.pem \
   -out config/certs/local-cert.pem \
   -days 365 \
-  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.local" \
-  -addext "subjectAltName=DNS:*.local,DNS:localhost"
+  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.lan" \
+  -addext "subjectAltName=DNS:*.lan,DNS:localhost"
 
 # Secure permissions
 chmod 600 config/certs/local-key.pem
@@ -200,7 +200,7 @@ labels:
   - "traefik.enable=true"
 
   # Router configuration
-  - "traefik.http.routers.<service>.rule=Host(`<service>${DOMAIN_SUFFIX:-.local}`)"
+  - "traefik.http.routers.<service>.rule=Host(`<service>${DOMAIN_SUFFIX:-.lan}`)"
   - "traefik.http.routers.<service>.entrypoints=websecure"
   - "traefik.http.routers.<service>.tls=true"
 
@@ -216,7 +216,7 @@ labels:
 ```yaml
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN:-jellyfin.local}`)"
+  - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN:-jellyfin.lan}`)"
   - "traefik.http.routers.jellyfin.entrypoints=websecure"
   - "traefik.http.routers.jellyfin.tls=true"
   - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
@@ -237,7 +237,7 @@ labels:
   - "traefik.http.routers.web-ui-public.service=web-ui"
 
   # Local domain (Self-signed)
-  - "traefik.http.routers.web-ui-admin.rule=Host(`dashboard${DOMAIN_SUFFIX:-.local}`)"
+  - "traefik.http.routers.web-ui-admin.rule=Host(`dashboard${DOMAIN_SUFFIX:-.lan}`)"
   - "traefik.http.routers.web-ui-admin.entrypoints=websecure"
   - "traefik.http.routers.web-ui-admin.tls=true"
   - "traefik.http.routers.web-ui-admin.service=web-ui"
@@ -312,8 +312,8 @@ openssl req -new -x509 -sha256 \
   -key config/certs/local-key.pem \
   -out config/certs/local-cert.pem \
   -days 365 \
-  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.local" \
-  -addext "subjectAltName=DNS:*.local,DNS:localhost"
+  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.lan" \
+  -addext "subjectAltName=DNS:*.lan,DNS:localhost"
 
 chmod 600 config/certs/local-key.pem
 chmod 644 config/certs/local-cert.pem
@@ -410,7 +410,7 @@ docker-compose logs -f traefik | grep acme
 
 ### Step 9: Trust Self-Signed Certificate (Client-Side)
 
-For local `.local` domains, import the certificate on client machines:
+For local `.lan` domains, import the certificate on client machines:
 
 **Linux:**
 ```bash
@@ -448,11 +448,11 @@ Settings → Privacy & Security → Certificates → View Certificates → Impor
 
 ```bash
 # Test HTTPS endpoints
-curl -k https://jellyfin.local
-curl -k https://jellyseerr.local
-curl -k https://sonarr.local
-curl -k https://grafana.local
-curl -k https://dashboard.local
+curl -k https://jellyfin.lan
+curl -k https://jellyseerr.lan
+curl -k https://sonarr.lan
+curl -k https://grafana.lan
+curl -k https://dashboard.lan
 
 # Test public domain (if configured)
 curl https://otterammo.xyz
@@ -462,8 +462,8 @@ curl https://otterammo.xyz
 
 ```bash
 # Should redirect to HTTPS
-curl -I http://jellyfin.local
-# Look for: Location: https://jellyfin.local
+curl -I http://jellyfin.lan
+# Look for: Location: https://jellyfin.lan
 ```
 
 ### Test 3: Certificate Validation
@@ -473,30 +473,30 @@ curl -I http://jellyfin.local
 openssl s_client -connect otterammo.xyz:443 -servername otterammo.xyz < /dev/null | grep -A 2 "Verify return code"
 
 # Check self-signed cert (local domain)
-openssl s_client -connect jellyfin.local:443 -servername jellyfin.local < /dev/null | grep -A 5 "subject="
+openssl s_client -connect jellyfin.lan:443 -servername jellyfin.lan < /dev/null | grep -A 5 "subject="
 ```
 
 ### Test 4: TLS Version
 
 ```bash
 # Test TLS 1.2
-openssl s_client -connect jellyfin.local:443 -tls1_2 < /dev/null
+openssl s_client -connect jellyfin.lan:443 -tls1_2 < /dev/null
 
 # Test TLS 1.3
-openssl s_client -connect jellyfin.local:443 -tls1_3 < /dev/null
+openssl s_client -connect jellyfin.lan:443 -tls1_3 < /dev/null
 
 # TLS 1.0/1.1 should fail
-openssl s_client -connect jellyfin.local:443 -tls1 < /dev/null  # Should fail
+openssl s_client -connect jellyfin.lan:443 -tls1 < /dev/null  # Should fail
 ```
 
 ### Test 5: Browser Access
 
 Open in browser (after importing self-signed cert):
-- https://jellyfin.local
-- https://jellyseerr.local
-- https://sonarr.local
-- https://grafana.local
-- https://dashboard.local
+- https://jellyfin.lan
+- https://jellyseerr.lan
+- https://sonarr.lan
+- https://grafana.lan
+- https://dashboard.lan
 - https://otterammo.xyz
 
 Should show secure (lock icon) without warnings.
@@ -546,7 +546,7 @@ docker-compose logs traefik | grep -i acme
 ### Issue: Browser Shows "Not Secure"
 
 **Symptoms:**
-Browser shows SSL warning for `.local` domains
+Browser shows SSL warning for `.lan` domains
 
 **Solution:**
 This is expected for self-signed certificates. Options:
@@ -566,7 +566,7 @@ grep -r "http://" */config/
 
 # Update to use HTTPS or relative URLs
 # Example in Jellyseerr config:
-# Sonarr URL: https://sonarr.local instead of http://sonarr.local
+# Sonarr URL: https://sonarr.lan instead of http://sonarr.lan
 ```
 
 ### Issue: Certificate Not Renewing

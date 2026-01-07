@@ -35,12 +35,12 @@ This directory contains the Docker Compose configuration for Cloudflare Tunnel (
 
 In the Cloudflare Zero Trust dashboard, configure routes for your services:
 
-- **jellyfin.yourdomain.com** → `http://traefik:80` (with Host header: `jellyfin.local`)
-- **jellyseerr.yourdomain.com** → `http://traefik:80` (with Host header: `jellyseerr.local`)
-- **sonarr.yourdomain.com** → `http://traefik:80` (with Host header: `sonarr.local`)
-- **radarr.yourdomain.com** → `http://traefik:80` (with Host header: `radarr.local`)
-- **prowlarr.yourdomain.com** → `http://traefik:80` (with Host header: `prowlarr.local`)
-- **qbittorrent.yourdomain.com** → `http://traefik:80` (with Host header: `qbittorrent.local`)
+- **jellyfin.yourdomain.com** → `http://traefik:80` (with Host header: `jellyfin.lan`)
+- **jellyseerr.yourdomain.com** → `http://traefik:80` (with Host header: `jellyseerr.lan`)
+- **sonarr.yourdomain.com** → `http://traefik:80` (with Host header: `sonarr.lan`)
+- **radarr.yourdomain.com** → `http://traefik:80` (with Host header: `radarr.lan`)
+- **prowlarr.yourdomain.com** → `http://traefik:80` (with Host header: `prowlarr.lan`)
+- **qbittorrent.yourdomain.com** → `http://traefik:80` (with Host header: `qbittorrent.lan`)
 
 ### 4. Start the Services
 

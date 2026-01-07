@@ -62,8 +62,8 @@ docker network ls >> docs/current-state.txt
 ss -tlnp | grep LISTEN >> docs/current-state.txt
 
 # 3. Test current setup
-curl -I http://jellyfin.local
-curl -I http://sonarr.local
+curl -I http://jellyfin.lan
+curl -I http://sonarr.lan
 # ... test all your services
 
 # 4. Create working branch (if using git)
@@ -174,7 +174,7 @@ docker-compose up -d
 
 # 4. Verify
 docker-compose ps
-curl -I http://jellyfin.local
+curl -I http://jellyfin.lan
 ```
 
 ### Iteration-specific rollback:
@@ -218,7 +218,7 @@ Think of them like VLANs for containers. Services on same network can talk to ea
 Acts as a gateway. Instead of exposing each service on its own port, Traefik routes based on hostname.
 
 **Current:** jellyfin on port 8096, sonarr on 8989, etc.
-**Future:** All via Traefik on port 80/443 (jellyfin.local, sonarr.local)
+**Future:** All via Traefik on port 80/443 (jellyfin.lan, sonarr.lan)
 
 ### Authelia (SSO)
 Single sign-on service. Login once, access all protected services.
@@ -256,7 +256,7 @@ After each iteration, you should see:
 
 **Iteration 2:**
 - `ss -tlnp | grep LISTEN` shows only 3 ports: 80, 443, 6881
-- All services accessible via Traefik (*.local domains)
+- All services accessible via Traefik (*.lan domains)
 
 **Iteration 3:**
 - Browser shows 🔒 (secure) for all services
@@ -312,7 +312,7 @@ After each iteration, you should see:
 1. ✅ Check the iteration's "Troubleshooting" section
 2. ✅ Review `docker-compose logs <service>`
 3. ✅ Verify service networks: `docker inspect <service> | grep -A 10 Networks`
-4. ✅ Test with curl: `curl -v http://service.local`
+4. ✅ Test with curl: `curl -v http://service.lan`
 
 ### When asking for help, include:
 

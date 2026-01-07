@@ -48,9 +48,9 @@ graph LR
     end
 
     subgraph Services
-        WUI[Web UI<br/>dashboard.local<br/>otterammo.xyz]
-        JF[Jellyfin<br/>jellyfin.local]
-        OTHERS[Other Services<br/>*.local domains]
+        WUI[Web UI<br/>dashboard.lan<br/>otterammo.xyz]
+        JF[Jellyfin<br/>jellyfin.lan]
+        OTHERS[Other Services<br/>*.lan domains]
     end
 
     USERS -->|HTTPS| CF
@@ -255,7 +255,7 @@ graph TB
 
 #### Local Access (Direct)
 - LAN clients → Traefik (port 80) → Services
-- Local domain suffix: `.local`
+- Local domain suffix: `.lan`
 
 ### Port Mappings
 

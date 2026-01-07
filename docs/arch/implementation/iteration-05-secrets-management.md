@@ -359,18 +359,18 @@ TZ=America/New_York
 NETWORK_NAME=media-network
 
 # Domain Configuration
-DOMAIN_SUFFIX=.local
+DOMAIN_SUFFIX=.lan
 PUBLIC_DASHBOARD_DOMAIN=otterammo.xyz
 SERVER_IP=192.168.86.111
 
 # Service Domains
-JELLYFIN_DOMAIN=jellyfin.local
-JELLYSEERR_DOMAIN=jellyseerr.local
-SONARR_DOMAIN=sonarr.local
-RADARR_DOMAIN=radarr.local
-PROWLARR_DOMAIN=prowlarr.local
-BAZARR_DOMAIN=bazarr.local
-QBITTORRENT_DOMAIN=qbittorrent.local
+JELLYFIN_DOMAIN=jellyfin.lan
+JELLYSEERR_DOMAIN=jellyseerr.lan
+SONARR_DOMAIN=sonarr.lan
+RADARR_DOMAIN=radarr.lan
+PROWLARR_DOMAIN=prowlarr.lan
+BAZARR_DOMAIN=bazarr.lan
+QBITTORRENT_DOMAIN=qbittorrent.lan
 
 # VPN Configuration (non-sensitive)
 VPN_PROVIDER=mullvad
@@ -418,18 +418,18 @@ TZ=America/New_York
 NETWORK_NAME=media-network
 
 # Domain Configuration
-DOMAIN_SUFFIX=.local
+DOMAIN_SUFFIX=.lan
 PUBLIC_DASHBOARD_DOMAIN=your-domain.com
 SERVER_IP=192.168.1.100
 
 # Service Domains
-JELLYFIN_DOMAIN=jellyfin.local
-JELLYSEERR_DOMAIN=jellyseerr.local
-SONARR_DOMAIN=sonarr.local
-RADARR_DOMAIN=radarr.local
-PROWLARR_DOMAIN=prowlarr.local
-BAZARR_DOMAIN=bazarr.local
-QBITTORRENT_DOMAIN=qbittorrent.local
+JELLYFIN_DOMAIN=jellyfin.lan
+JELLYSEERR_DOMAIN=jellyseerr.lan
+SONARR_DOMAIN=sonarr.lan
+RADARR_DOMAIN=radarr.lan
+PROWLARR_DOMAIN=prowlarr.lan
+BAZARR_DOMAIN=bazarr.lan
+QBITTORRENT_DOMAIN=qbittorrent.lan
 
 # VPN Configuration
 VPN_PROVIDER=mullvad
@@ -649,7 +649,7 @@ docker-compose logs cloudflared | grep -i "connected"
 docker-compose logs gluetun | grep -i "wireguard"
 
 # Grafana login
-curl -u admin:$(cat secrets/grafana_password.txt) https://grafana.local/api/health
+curl -u admin:$(cat secrets/grafana_password.txt) https://grafana.lan/api/health
 ```
 
 ### Test 3: Secrets Not in Environment

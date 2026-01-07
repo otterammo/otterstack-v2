@@ -464,13 +464,13 @@ curl -s http://localhost:8090/api/http/services | jq '.[] | select(.name | conta
 
 ```bash
 # Test Jellyfin via Traefik
-curl -I http://jellyfin.local
+curl -I http://jellyfin.lan
 
 # Test Jellyseerr via Traefik
-curl -I http://jellyseerr.local
+curl -I http://jellyseerr.lan
 
 # Test Dashboard via Traefik
-curl -I http://dashboard.local
+curl -I http://dashboard.lan
 ```
 
 ### Test 4: Application Workflows

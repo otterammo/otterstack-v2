@@ -38,7 +38,7 @@ Modern Next.js-based web interface for the Media Stack that replaces both the pr
 TZ=UTC
 
 # Domain configuration
-DOMAIN_SUFFIX=.local
+DOMAIN_SUFFIX=.lan
 PUBLIC_DASHBOARD_DOMAIN=otterammo.xyz
 
 # Admin authentication
@@ -108,7 +108,7 @@ docker compose up -d
 ### Access
 
 - **Public Site**: http://otterammo.xyz (or your configured domain)
-- **Admin Site**: http://dashboard.local (or your configured domain)
+- **Admin Site**: http://dashboard.lan (or your configured domain)
 
 ### Traefik Integration
 

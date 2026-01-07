@@ -48,6 +48,6 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=web"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"

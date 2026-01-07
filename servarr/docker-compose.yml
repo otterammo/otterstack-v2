@@ -3,7 +3,7 @@ services:
     image: linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://sonarr.local
+    # Removed: ports - Access via Traefik at http://sonarr.lan
     volumes:
       - ./sonarr/config:/config
       - ${TV_PATH:-/mnt/external/tv}:/tv
@@ -30,7 +30,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.sonarr.rule=Host(`${SONARR_DOMAIN:-sonarr.local}`)"
+      - "traefik.http.routers.sonarr.rule=Host(`${SONARR_DOMAIN:-sonarr.lan}`)"
       - "traefik.http.routers.sonarr.entrypoints=web"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
 
@@ -38,7 +38,7 @@ services:
     image: linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://radarr.local
+    # Removed: ports - Access via Traefik at http://radarr.lan
     volumes:
       - ./radarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies
@@ -65,7 +65,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.radarr.rule=Host(`${RADARR_DOMAIN:-radarr.local}`)"
+      - "traefik.http.routers.radarr.rule=Host(`${RADARR_DOMAIN:-radarr.lan}`)"
       - "traefik.http.routers.radarr.entrypoints=web"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
 
@@ -73,7 +73,7 @@ services:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://prowlarr.local
+    # Removed: ports - Access via Traefik at http://prowlarr.lan
     volumes:
       - ./prowlarr/config:/config
     environment:
@@ -98,7 +98,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_DOMAIN:-prowlarr.local}`)"
+      - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_DOMAIN:-prowlarr.lan}`)"
       - "traefik.http.routers.prowlarr.entrypoints=web"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
@@ -106,7 +106,7 @@ services:
     image: linuxserver/bazarr:latest
     container_name: bazarr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://bazarr.local
+    # Removed: ports - Access via Traefik at http://bazarr.lan
     volumes:
       - ./bazarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies
@@ -132,6 +132,6 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_DOMAIN:-bazarr.local}`)"
+      - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_DOMAIN:-bazarr.lan}`)"
       - "traefik.http.routers.bazarr.entrypoints=web"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"

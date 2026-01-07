@@ -31,8 +31,8 @@
   ```
 - [ ] Test Traefik routing for all services
   ```bash
-  curl -I http://jellyfin.local
-  curl -I http://jellyseerr.local
+  curl -I http://jellyfin.lan
+  curl -I http://jellyseerr.lan
   # ... test all services
   ```
 - [ ] Update DNS/hosts file if needed
@@ -96,7 +96,7 @@ services:
       # Remove direct dashboard port, access via Traefik routing
     labels:
       # Dashboard accessible via Traefik
-      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.local}`)"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=web"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
 ```
@@ -120,7 +120,7 @@ services:
   jellyfin:
     # Remove all port mappings
     # ports: []  # Commented out or removed
-    # Access via Traefik only: http://jellyfin.local
+    # Access via Traefik only: http://jellyfin.lan
 ```
 
 **Note:** DLNA discovery (1900/udp) and auto-discovery (7359/udp) will not work. If needed, these can be re-enabled with network_mode: host (not recommended).
@@ -140,7 +140,7 @@ services:
 services:
   jellyseerr:
     # Remove port mapping
-    # Access via Traefik: http://jellyseerr.local
+    # Access via Traefik: http://jellyseerr.lan
 ```
 
 ### Servarr Services (servarr/docker-compose.yml)
@@ -170,19 +170,19 @@ services:
 services:
   sonarr:
     # Remove port mapping
-    # Access via Traefik: http://sonarr.local
+    # Access via Traefik: http://sonarr.lan
 
   radarr:
     # Remove port mapping
-    # Access via Traefik: http://radarr.local
+    # Access via Traefik: http://radarr.lan
 
   prowlarr:
     # Remove port mapping
-    # Access via Traefik: http://prowlarr.local
+    # Access via Traefik: http://prowlarr.lan
 
   bazarr:
     # Remove port mapping
-    # Access via Traefik: http://bazarr.local
+    # Access via Traefik: http://bazarr.lan
 ```
 
 ### Download Services (qbittorrent/docker-compose.yml)
@@ -205,7 +205,7 @@ services:
       # Remove WebUI port, access via Traefik
       - "6881:6881"     # Keep for torrent traffic
       - "6881:6881/udp"
-    # WebUI access via Traefik: http://qbittorrent.local
+    # WebUI access via Traefik: http://qbittorrent.lan
 ```
 
 ### Monitoring Services (monitoring/docker-compose.yml)
@@ -239,15 +239,15 @@ services:
 services:
   prometheus:
     # Remove port mapping
-    # Access via Traefik: http://prometheus.local
+    # Access via Traefik: http://prometheus.lan
 
   grafana:
     # Remove port mapping
-    # Access via Traefik: http://grafana.local
+    # Access via Traefik: http://grafana.lan
 
   cadvisor:
     # Remove port mapping
-    # Access via Traefik: http://cadvisor.local
+    # Access via Traefik: http://cadvisor.lan
 
   node-exporter:
     # Remove port mapping (internal metrics only)
@@ -255,7 +255,7 @@ services:
 
   alertmanager:
     # Remove port mapping
-    # Access via Traefik: http://alertmanager.local
+    # Access via Traefik: http://alertmanager.lan
 ```
 
 ### Dozzle (dozzle/docker-compose.yml)
@@ -273,7 +273,7 @@ services:
 services:
   dozzle:
     # Remove port mapping
-    # Access via Traefik: http://dozzle.local
+    # Access via Traefik: http://dozzle.lan
 ```
 
 ### Web UI (web-ui/docker-compose.yml)
@@ -291,7 +291,7 @@ services:
 services:
   web-ui:
     # Remove port mapping
-    # Access via Traefik: http://dashboard.local or http://otterammo.xyz
+    # Access via Traefik: http://dashboard.lan or http://otterammo.xyz
 ```
 
 ---
@@ -304,7 +304,7 @@ Ensure all services have proper Traefik labels:
 # Example for each service
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.<service>.rule=Host(`<service>${DOMAIN_SUFFIX:-.local}`)"
+  - "traefik.http.routers.<service>.rule=Host(`<service>${DOMAIN_SUFFIX:-.lan}`)"
   - "traefik.http.routers.<service>.entrypoints=web"
   - "traefik.http.services.<service>.loadbalancer.server.port=<internal_port>"
 ```
@@ -360,7 +360,7 @@ docker-compose up -d traefik
 
 # Verify Traefik is healthy
 docker-compose ps traefik
-curl -I http://traefik.local
+curl -I http://traefik.lan
 ```
 
 ### Step 3: Remove Ports Per Service (One at a Time)
@@ -374,9 +374,9 @@ nano monitoring/docker-compose.yml
 docker-compose up -d cadvisor node-exporter alertmanager prometheus
 
 # Test access via Traefik
-curl -I http://prometheus.local
-curl -I http://cadvisor.local
-curl -I http://alertmanager.local
+curl -I http://prometheus.lan
+curl -I http://cadvisor.lan
+curl -I http://alertmanager.lan
 
 # 2. Management tools
 nano dozzle/docker-compose.yml
@@ -384,7 +384,7 @@ nano dozzle/docker-compose.yml
 docker-compose up -d dozzle
 
 # Test
-curl -I http://dozzle.local
+curl -I http://dozzle.lan
 
 # 3. Automation services
 nano servarr/docker-compose.yml
@@ -392,10 +392,10 @@ nano servarr/docker-compose.yml
 docker-compose up -d sonarr radarr prowlarr bazarr
 
 # Test
-curl -I http://sonarr.local
-curl -I http://radarr.local
-curl -I http://prowlarr.local
-curl -I http://bazarr.local
+curl -I http://sonarr.lan
+curl -I http://radarr.lan
+curl -I http://prowlarr.lan
+curl -I http://bazarr.lan
 
 # 4. Download services
 nano qbittorrent/docker-compose.yml
@@ -403,7 +403,7 @@ nano qbittorrent/docker-compose.yml
 docker-compose up -d gluetun
 
 # Test
-curl -I http://qbittorrent.local
+curl -I http://qbittorrent.lan
 
 # 5. User-facing services
 nano jellyseerr/docker-compose.yml
@@ -411,14 +411,14 @@ nano jellyseerr/docker-compose.yml
 docker-compose up -d jellyseerr
 
 # Test
-curl -I http://jellyseerr.local
+curl -I http://jellyseerr.lan
 
 nano jellyfin/docker-compose.yml
 # Remove ports: 8096, 8920, 7359, 1900
 docker-compose up -d jellyfin
 
 # Test
-curl -I http://jellyfin.local
+curl -I http://jellyfin.lan
 # Test streaming in browser
 
 # 6. Web UI
@@ -427,7 +427,7 @@ nano web-ui/docker-compose.yml
 docker-compose up -d web-ui
 
 # Test
-curl -I http://dashboard.local
+curl -I http://dashboard.lan
 
 # 7. Grafana (last, so we can monitor throughout)
 nano monitoring/docker-compose.yml
@@ -435,7 +435,7 @@ nano monitoring/docker-compose.yml
 docker-compose up -d grafana
 
 # Test
-curl -I http://grafana.local
+curl -I http://grafana.lan
 ```
 
 ### Step 4: Update /etc/hosts or DNS
@@ -447,20 +447,20 @@ If using local DNS resolution, update entries:
 sudo nano /etc/hosts
 
 # Add/update entries to use Traefik
-192.168.86.111  jellyfin.local
-192.168.86.111  jellyseerr.local
-192.168.86.111  sonarr.local
-192.168.86.111  radarr.local
-192.168.86.111  prowlarr.local
-192.168.86.111  bazarr.local
-192.168.86.111  qbittorrent.local
-192.168.86.111  prometheus.local
-192.168.86.111  grafana.local
-192.168.86.111  cadvisor.local
-192.168.86.111  alertmanager.local
-192.168.86.111  dozzle.local
-192.168.86.111  dashboard.local
-192.168.86.111  traefik.local
+192.168.86.111  jellyfin.lan
+192.168.86.111  jellyseerr.lan
+192.168.86.111  sonarr.lan
+192.168.86.111  radarr.lan
+192.168.86.111  prowlarr.lan
+192.168.86.111  bazarr.lan
+192.168.86.111  qbittorrent.lan
+192.168.86.111  prometheus.lan
+192.168.86.111  grafana.lan
+192.168.86.111  cadvisor.lan
+192.168.86.111  alertmanager.lan
+192.168.86.111  dozzle.lan
+192.168.86.111  dashboard.lan
+192.168.86.111  traefik.lan
 ```
 
 ### Step 5: Update Firewall Rules
@@ -531,20 +531,20 @@ docker network ls | grep media-network
 ```bash
 # Test all services via Traefik
 services=(
-    "jellyfin.local"
-    "jellyseerr.local"
-    "sonarr.local"
-    "radarr.local"
-    "prowlarr.local"
-    "bazarr.local"
-    "qbittorrent.local"
-    "prometheus.local"
-    "grafana.local"
-    "cadvisor.local"
-    "alertmanager.local"
-    "dozzle.local"
-    "dashboard.local"
-    "traefik.local"
+    "jellyfin.lan"
+    "jellyseerr.lan"
+    "sonarr.lan"
+    "radarr.lan"
+    "prowlarr.lan"
+    "bazarr.lan"
+    "qbittorrent.lan"
+    "prometheus.lan"
+    "grafana.lan"
+    "cadvisor.lan"
+    "alertmanager.lan"
+    "dozzle.lan"
+    "dashboard.lan"
+    "traefik.lan"
 )
 
 for service in "${services[@]}"; do
@@ -585,27 +585,27 @@ nmap -p 1-10000 192.168.86.111
 ### Test 4: Application Workflows
 
 **Streaming Test:**
-1. Open browser to http://jellyfin.local
+1. Open browser to http://jellyfin.lan
 2. Log in
 3. Play a movie/show
 4. Verify streaming works
 
 **Request Test:**
-1. Open http://jellyseerr.local
+1. Open http://jellyseerr.lan
 2. Request a TV show
-3. Check http://sonarr.local for request
+3. Check http://sonarr.lan for request
 4. Verify workflow completes
 
 **Download Test:**
-1. Manually add torrent to http://qbittorrent.local
+1. Manually add torrent to http://qbittorrent.lan
 2. Verify download starts
 3. Check VPN connection in Gluetun logs
 
 **Monitoring Test:**
-1. Open http://grafana.local
+1. Open http://grafana.lan
 2. Check dashboards load
 3. Verify metrics are current
-4. Open http://dozzle.local
+4. Open http://dozzle.lan
 5. Verify logs streaming
 
 ---
@@ -637,7 +637,7 @@ nmap -p 1-10000 192.168.86.111
 
 **Symptoms:**
 ```
-curl: (7) Failed to connect to <service>.local port 80: Connection refused
+curl: (7) Failed to connect to <service>.lan port 80: Connection refused
 ```
 
 **Solution:**
@@ -678,7 +678,7 @@ docker-compose logs <service>
 ### Issue: Can't access Traefik dashboard
 
 **Symptoms:**
-404 Not Found when accessing http://traefik.local
+404 Not Found when accessing http://traefik.lan
 
 **Solution:**
 ```bash
@@ -715,7 +715,7 @@ DLNA requires UDP ports 1900 and 7359. Options:
    ```
 
 3. **Manual client configuration** (recommended):
-   Configure DLNA clients to use http://jellyfin.local:80 directly
+   Configure DLNA clients to use http://jellyfin.lan:80 directly
 
 ---
 

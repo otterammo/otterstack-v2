@@ -147,7 +147,7 @@ http://localhost:8080
 
 or via Traefik domain:
 ```
-http://qbittorrent.local
+http://qbittorrent.lan
 ```
 
 ## Step 7: Configure qBittorrent Settings

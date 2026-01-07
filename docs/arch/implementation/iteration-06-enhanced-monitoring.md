@@ -184,7 +184,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.loki.rule=Host(`loki.local`)"
+      - "traefik.http.routers.loki.rule=Host(`loki.lan`)"
       - "traefik.http.routers.loki.entrypoints=websecure"
       - "traefik.http.routers.loki.tls=true"
       - "traefik.http.routers.loki.middlewares=authelia@docker"
@@ -593,7 +593,7 @@ curl -G -s "http://localhost:3100/loki/api/v1/query" \
 
 ### Step 9: Import Dashboards
 
-1. Open Grafana (https://grafana.local)
+1. Open Grafana (https://grafana.lan)
 2. Go to Dashboards → Import
 3. Import pre-built dashboards:
    - **Docker Dashboard**: ID 893

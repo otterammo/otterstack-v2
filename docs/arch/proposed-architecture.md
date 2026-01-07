@@ -357,27 +357,27 @@ access_control:
   rules:
     # Public - No authentication
     - domain:
-        - "jellyfin.local"
+        - "jellyfin.lan"
         - "otterammo.xyz"
       policy: bypass
 
     # Protected - Single factor (username/password)
     - domain:
-        - "jellyseerr.local"
-        - "dashboard.local"
+        - "jellyseerr.lan"
+        - "dashboard.lan"
       policy: one_factor
 
     # Admin - Two factor required
     - domain:
-        - "sonarr.local"
-        - "radarr.local"
-        - "prowlarr.local"
-        - "bazarr.local"
-        - "qbittorrent.local"
-        - "grafana.local"
-        - "prometheus.local"
-        - "traefik.local"
-        - "dozzle.local"
+        - "sonarr.lan"
+        - "radarr.lan"
+        - "prowlarr.lan"
+        - "bazarr.lan"
+        - "qbittorrent.lan"
+        - "grafana.lan"
+        - "prometheus.lan"
+        - "traefik.lan"
+        - "dozzle.lan"
       policy: two_factor
 ```
 

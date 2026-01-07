@@ -4,7 +4,7 @@ services:
     container_name: prometheus
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://prometheus.local
+    # Removed: ports - Access via Traefik at http://prometheus.lan
     volumes:
       - ./prometheus/config:/etc/prometheus
       - ./prometheus/data:/prometheus
@@ -40,7 +40,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.local`)"
+      - "traefik.http.routers.prometheus.rule=Host(`prometheus.lan`)"
       - "traefik.http.routers.prometheus.entrypoints=web"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
@@ -49,7 +49,7 @@ services:
     container_name: grafana
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
-    # Removed: ports - Access via Traefik at http://grafana.local
+    # Removed: ports - Access via Traefik at http://grafana.lan
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
@@ -81,7 +81,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.local`)"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.lan`)"
       - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
@@ -89,7 +89,7 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
     container_name: cadvisor
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://cadvisor.local
+    # Removed: ports - Access via Traefik at http://cadvisor.lan
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -110,7 +110,7 @@ services:
       - mgmt-net          # Management layer
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cadvisor.rule=Host(`cadvisor.local`)"
+      - "traefik.http.routers.cadvisor.rule=Host(`cadvisor.lan`)"
       - "traefik.http.routers.cadvisor.entrypoints=web"
       - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
 
@@ -155,7 +155,7 @@ services:
     container_name: alertmanager
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://alertmanager.local
+    # Removed: ports - Access via Traefik at http://alertmanager.lan
     volumes:
       - ./alertmanager/config:/etc/alertmanager
       - ./alertmanager/data:/alertmanager
@@ -183,6 +183,6 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.local`)"
+      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.lan`)"
       - "traefik.http.routers.alertmanager.entrypoints=web"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"

@@ -103,13 +103,13 @@ services:
       - "traefik.docker.network=frontend-net"
 
       # Auth portal
-      - "traefik.http.routers.authelia.rule=Host(`auth${DOMAIN_SUFFIX:-.local}`)"
+      - "traefik.http.routers.authelia.rule=Host(`auth${DOMAIN_SUFFIX:-.lan}`)"
       - "traefik.http.routers.authelia.entrypoints=websecure"
       - "traefik.http.routers.authelia.tls=true"
       - "traefik.http.services.authelia.loadbalancer.server.port=9091"
 
       # Forward auth middleware
-      - "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https://auth${DOMAIN_SUFFIX:-.local}"
+      - "traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/verify?rd=https://auth${DOMAIN_SUFFIX:-.lan}"
       - "traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 
@@ -167,7 +167,7 @@ log:
 
 totp:
   disable: false
-  issuer: media.local
+  issuer: media.lan
   algorithm: sha1
   digits: 6
   period: 30
@@ -197,34 +197,34 @@ access_control:
   rules:
     # Public services - no authentication
     - domain:
-        - "jellyfin.local"
+        - "jellyfin.lan"
         - "otterammo.xyz"
       policy: bypass
 
     # Protected services - single factor (username/password)
     - domain:
-        - "jellyseerr.local"
-        - "dashboard.local"
+        - "jellyseerr.lan"
+        - "dashboard.lan"
       policy: one_factor
 
     # Admin services - two factor (username/password + TOTP)
     - domain:
-        - "sonarr.local"
-        - "radarr.local"
-        - "prowlarr.local"
-        - "bazarr.local"
-        - "qbittorrent.local"
-        - "prometheus.local"
-        - "grafana.local"
-        - "cadvisor.local"
-        - "alertmanager.local"
-        - "traefik.local"
-        - "dozzle.local"
+        - "sonarr.lan"
+        - "radarr.lan"
+        - "prowlarr.lan"
+        - "bazarr.lan"
+        - "qbittorrent.lan"
+        - "prometheus.lan"
+        - "grafana.lan"
+        - "cadvisor.lan"
+        - "alertmanager.lan"
+        - "traefik.lan"
+        - "dozzle.lan"
       policy: two_factor
 
     # Auth portal itself - bypass
     - domain:
-        - "auth.local"
+        - "auth.lan"
       policy: bypass
 
 session:
@@ -368,7 +368,7 @@ For services requiring authentication, add Authelia middleware:
 ```yaml
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.local`)"
+  - "traefik.http.routers.jellyseerr.rule=Host(`jellyseerr.lan`)"
   - "traefik.http.routers.jellyseerr.entrypoints=websecure"
   - "traefik.http.routers.jellyseerr.tls=true"
   - "traefik.http.routers.jellyseerr.middlewares=authelia@docker"  # ADD THIS
@@ -500,16 +500,16 @@ docker-compose logs -f authelia
 
 ### Step 9: Test Authentication
 
-1. **Access auth portal**: https://auth.local
+1. **Access auth portal**: https://auth.lan
 2. **Login with admin credentials**
 3. **Set up TOTP 2FA**:
    - Scan QR code with authenticator app
    - Enter verification code
-4. **Test protected service**: https://jellyseerr.local
-   - Should redirect to auth.local
+4. **Test protected service**: https://jellyseerr.lan
+   - Should redirect to auth.lan
    - Login with credentials
    - Should redirect back to jellyseerr
-5. **Test admin service**: https://sonarr.local
+5. **Test admin service**: https://sonarr.lan
    - Should require 2FA code
 
 ### Step 10: Restart All Services
@@ -528,7 +528,7 @@ docker-compose up -d
 
 ```bash
 # Should work without authentication
-curl -I https://jellyfin.local
+curl -I https://jellyfin.lan
 curl -I https://otterammo.xyz
 ```
 
@@ -536,27 +536,27 @@ curl -I https://otterammo.xyz
 
 ```bash
 # Should redirect to auth portal
-curl -I https://jellyseerr.local
-# Look for: Location: https://auth.local/?rd=...
+curl -I https://jellyseerr.lan
+# Look for: Location: https://auth.lan/?rd=...
 ```
 
 ### Test 3: Admin Service (2FA)
 
 ```bash
 # Should redirect to auth portal with 2FA requirement
-curl -I https://sonarr.local
+curl -I https://sonarr.lan
 ```
 
 ### Test 4: Session Persistence
 
-1. Login to https://jellyseerr.local
+1. Login to https://jellyseerr.lan
 2. Close browser
-3. Reopen and visit https://jellyseerr.local
+3. Reopen and visit https://jellyseerr.lan
 4. Should remember session (within 1 hour)
 
 ### Test 5: 2FA Enforcement
 
-1. Login to https://sonarr.local
+1. Login to https://sonarr.lan
 2. Enter password
 3. Should prompt for TOTP code
 4. Incorrect code should fail
@@ -568,7 +568,7 @@ curl -I https://sonarr.local
 
 - [ ] Authelia service running and healthy
 - [ ] Redis service running and healthy
-- [ ] Auth portal accessible at https://auth.local
+- [ ] Auth portal accessible at https://auth.lan
 - [ ] Can login with admin credentials
 - [ ] Can setup 2FA (TOTP)
 - [ ] Public services accessible without auth
@@ -617,7 +617,7 @@ docker-compose logs authelia | grep "session domain"
 
 # Verify session.domain in configuration.yml matches DOMAIN_SUFFIX
 nano authelia/config/configuration.yml
-# session.domain should be "local" for .local domains
+# session.domain should be "local" for .lan domains
 ```
 
 ### Issue: 2FA Not Prompting

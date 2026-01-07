@@ -9,6 +9,7 @@ A Docker-based media management solution with automated deployment and managemen
    cp .env.template .env
    # Edit .env with your settings
    ```
+   - Default `DOMAIN_SUFFIX` is `.lan` to avoid Apple mDNS hijacking of `.local` on iOS/macOS. Change it here if you need a different internal domain.
 
 2. **Make the script executable**
    ```bash
@@ -106,4 +107,3 @@ This stack includes Gluetun VPN integration to protect qBittorrent torrent traff
 For detailed setup instructions, see [SETUP-VPN.md](./docs/SETUP-VPN.md).
 
 For architecture details, see [VPN-ARCHITECTURE.md](./docs/VPN-ARCHITECTURE.md).
-

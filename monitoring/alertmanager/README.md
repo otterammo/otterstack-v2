@@ -40,13 +40,13 @@ Alerts are routed based on severity:
 You can test your alert configuration by:
 
 1. Temporarily lowering an alert threshold in `prometheus/config/alert_rules.yml`
-2. Sending a test notification via Alertmanager UI at `http://alertmanager.local`
+2. Sending a test notification via Alertmanager UI at `http://alertmanager.lan`
 3. Stopping a critical service to trigger a `ServiceDown` alert
 
 ## Alertmanager UI
 
 Access the Alertmanager web interface at:
-- Local: `http://alertmanager.local`
+- Local: `http://alertmanager.lan`
 - Direct: `http://localhost:9093`
 
 Features:
@@ -101,11 +101,11 @@ receivers:
 2. Verify webhook URL is correct in `alertmanager.yml`
 
 3. Check Prometheus is connected to Alertmanager:
-   - Visit `http://prometheus.local/status`
+   - Visit `http://prometheus.lan/status`
    - Look for Alertmanager in the "Runtime & Build Information" section
 
 4. Verify alerts are firing:
-   - Visit `http://prometheus.local/alerts`
+   - Visit `http://prometheus.lan/alerts`
    - Check alert status
 
 5. Test webhook manually:

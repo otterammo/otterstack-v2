@@ -32,7 +32,7 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      # Removed: 8080:8080 - qBittorrent WebUI via Traefik at http://qbittorrent.local
+      # Removed: 8080:8080 - qBittorrent WebUI via Traefik at http://qbittorrent.lan
       - "6881:6881"      # BitTorrent traffic (TCP)
       - "6881:6881/udp"  # BitTorrent traffic (UDP)
     environment:
@@ -61,7 +61,7 @@ services:
     labels:
       - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.local}`)"
+      - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.lan}`)"
       - "traefik.http.routers.qbittorrent.entrypoints=web"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 

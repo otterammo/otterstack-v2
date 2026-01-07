@@ -680,7 +680,7 @@ ls -lh /mnt/backups/
 ```bash
 # Rapid requests to test rate limit
 for i in {1..150}; do
-    curl -s -o /dev/null -w "%{http_code}\n" https://jellyfin.local
+    curl -s -o /dev/null -w "%{http_code}\n" https://jellyfin.lan
     sleep 0.1
 done
 
@@ -719,7 +719,7 @@ ls -lh /mnt/backups/
 
 ```bash
 # Test rate limit
-ab -n 200 -c 10 https://jellyfin.local/
+ab -n 200 -c 10 https://jellyfin.lan/
 
 # Check Traefik logs for rate limit hits
 docker-compose logs traefik | grep "429"

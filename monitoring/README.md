@@ -17,11 +17,11 @@ This monitoring setup provides observability for the media stack using Prometheu
    ```
 
 2. **Access Grafana:**
-   - URL: http://grafana.local
+   - URL: http://grafana.lan
    - Default credentials: admin/admin (change on first login)
 
 3. **Access Prometheus:**
-   - URL: http://prometheus.local
+   - URL: http://prometheus.lan
 
 ## Configuration
 

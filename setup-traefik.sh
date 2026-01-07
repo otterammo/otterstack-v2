@@ -73,19 +73,19 @@ else
     echo -e "${YELLOW}[WARNING]${NC} No running services found. Using fallback domains..."
     # Fallback to static list if discovery fails
     HOSTS_ENTRIES="$HOSTS_ENTRIES
-$IP bazarr.local
-$IP dashboard.local
-$IP jellyfin.local
-$IP jellyseerr.local
-$IP prowlarr.local
-$IP qbittorrent.local
-$IP radarr.local
-$IP sonarr.local
-$IP traefik.local
-$IP grafana.local
-$IP prometheus.local
-$IP cadvisor.local
-$IP alertmanager.local"
+$IP bazarr.lan
+$IP dashboard.lan
+$IP jellyfin.lan
+$IP jellyseerr.lan
+$IP prowlarr.lan
+$IP qbittorrent.lan
+$IP radarr.lan
+$IP sonarr.lan
+$IP traefik.lan
+$IP grafana.lan
+$IP prometheus.lan
+$IP cadvisor.lan
+$IP alertmanager.lan"
 fi
 
 echo -e "${GREEN}[HOSTS]${NC} To access services from other devices, add these entries to their hosts file:"
@@ -112,24 +112,24 @@ if [ ! -z "$SERVICE_DOMAINS" ]; then
     while read -r domain; do
         if [ ! -z "$domain" ]; then
             # Capitalize first letter for display
-            service_name=$(echo "$domain" | sed 's/\.local//' | sed 's/^./\U&/')
+            service_name=$(echo "$domain" | sed 's/\.lan//' | sed 's/^./\U&/')
             echo -e "  ${WHITE}•${NC} $service_name: ${CYAN}http://$domain${NC}"
         fi
     done <<< "$SERVICE_DOMAINS"
 else
     # Fallback display
-    echo -e "  ${WHITE}•${NC} Jellyfin: ${CYAN}http://jellyfin.local${NC}"
-    echo -e "  ${WHITE}•${NC} Jellyseerr: ${CYAN}http://jellyseerr.local${NC}"
-    echo -e "  ${WHITE}•${NC} Sonarr: ${CYAN}http://sonarr.local${NC}"
-    echo -e "  ${WHITE}•${NC} Radarr: ${CYAN}http://radarr.local${NC}"
-    echo -e "  ${WHITE}•${NC} Prowlarr: ${CYAN}http://prowlarr.local${NC}"
-    echo -e "  ${WHITE}•${NC} Bazarr: ${CYAN}http://bazarr.local${NC}"
-    echo -e "  ${WHITE}•${NC} qBittorrent: ${CYAN}http://qbittorrent.local${NC}"
-    echo -e "  ${WHITE}•${NC} Traefik Dashboard: ${CYAN}http://traefik.local${NC}"
-    echo -e "  ${WHITE}•${NC} Grafana: ${CYAN}http://grafana.local${NC}"
-    echo -e "  ${WHITE}•${NC} Prometheus: ${CYAN}http://prometheus.local${NC}"
-    echo -e "  ${WHITE}•${NC} cAdvisor: ${CYAN}http://cadvisor.local${NC}"
-    echo -e "  ${WHITE}•${NC} Alertmanager: ${CYAN}http://alertmanager.local${NC}"
+    echo -e "  ${WHITE}•${NC} Jellyfin: ${CYAN}http://jellyfin.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Jellyseerr: ${CYAN}http://jellyseerr.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Sonarr: ${CYAN}http://sonarr.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Radarr: ${CYAN}http://radarr.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Prowlarr: ${CYAN}http://prowlarr.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Bazarr: ${CYAN}http://bazarr.lan${NC}"
+    echo -e "  ${WHITE}•${NC} qBittorrent: ${CYAN}http://qbittorrent.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Traefik Dashboard: ${CYAN}http://traefik.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Grafana: ${CYAN}http://grafana.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Prometheus: ${CYAN}http://prometheus.lan${NC}"
+    echo -e "  ${WHITE}•${NC} cAdvisor: ${CYAN}http://cadvisor.lan${NC}"
+    echo -e "  ${WHITE}•${NC} Alertmanager: ${CYAN}http://alertmanager.lan${NC}"
 fi
 echo ""
 echo -e "${PURPLE}[DASHBOARD]${NC} Or use the dashboard: ${CYAN}file://$(pwd)/dashboard/dashboard.html${NC}"
