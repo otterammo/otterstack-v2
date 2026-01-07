@@ -4,6 +4,8 @@ export interface Service {
   description: string
   url: string
   displayUrl?: string  // URL to display to users (for external access)
+  localUrl?: string    // Local Traefik URL (e.g., http://service.lan)
+  publicUrl?: string   // Public-facing URL (e.g., routed through Traefik/Cloudflare)
   category: 'public' | 'media' | 'download' | 'infrastructure' | 'monitoring'
   icon?: string
   healthEndpoint?: string
