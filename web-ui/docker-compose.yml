@@ -16,17 +16,24 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=media-network"
-      
-      # Public site routing (primary domain)
+
+      # Public site routing via Cloudflare tunnel (HTTP)
       - "traefik.http.routers.web-ui-public.rule=Host(`${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}`)"
       - "traefik.http.routers.web-ui-public.entrypoints=web"
       - "traefik.http.routers.web-ui-public.service=web-ui"
-      
-      # Admin site routing (local domain)
+
+      # Admin site HTTPS router (local domain)
       - "traefik.http.routers.web-ui-admin.rule=Host(`dashboard${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.web-ui-admin.entrypoints=web"
+      - "traefik.http.routers.web-ui-admin.entrypoints=websecure"
+      - "traefik.http.routers.web-ui-admin.tls=true"
       - "traefik.http.routers.web-ui-admin.service=web-ui"
-      
+
+      # HTTP redirect for local domain only
+      - "traefik.http.routers.web-ui-admin-http.rule=Host(`dashboard${DOMAIN_SUFFIX:-.lan}`)"
+      - "traefik.http.routers.web-ui-admin-http.entrypoints=web"
+      - "traefik.http.routers.web-ui-admin-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.web-ui-admin-http.service=web-ui"
+
       # Service definition
       - "traefik.http.services.web-ui.loadbalancer.server.port=3000"
     healthcheck:

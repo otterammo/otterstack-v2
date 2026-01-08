@@ -61,8 +61,17 @@ services:
     labels:
       - "autoheal=true"
       - "traefik.enable=true"
+      # HTTPS router
       - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.lan}`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=web"
+      - "traefik.http.routers.qbittorrent.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent.tls=true"
+      - "traefik.http.routers.qbittorrent.service=qbittorrent"
+      # HTTP redirect router
+      - "traefik.http.routers.qbittorrent-http.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.lan}`)"
+      - "traefik.http.routers.qbittorrent-http.entrypoints=web"
+      - "traefik.http.routers.qbittorrent-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.qbittorrent-http.service=qbittorrent"
+      # Service definition
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 
   autoheal:

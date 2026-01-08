@@ -30,8 +30,17 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
+      # HTTPS router
       - "traefik.http.routers.sonarr.rule=Host(`${SONARR_DOMAIN:-sonarr.lan}`)"
-      - "traefik.http.routers.sonarr.entrypoints=web"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.routers.sonarr.service=sonarr"
+      # HTTP redirect router
+      - "traefik.http.routers.sonarr-http.rule=Host(`${SONARR_DOMAIN:-sonarr.lan}`)"
+      - "traefik.http.routers.sonarr-http.entrypoints=web"
+      - "traefik.http.routers.sonarr-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.sonarr-http.service=sonarr"
+      # Service definition
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
 
   radarr:
@@ -65,8 +74,17 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
+      # HTTPS router
       - "traefik.http.routers.radarr.rule=Host(`${RADARR_DOMAIN:-radarr.lan}`)"
-      - "traefik.http.routers.radarr.entrypoints=web"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.routers.radarr.service=radarr"
+      # HTTP redirect router
+      - "traefik.http.routers.radarr-http.rule=Host(`${RADARR_DOMAIN:-radarr.lan}`)"
+      - "traefik.http.routers.radarr-http.entrypoints=web"
+      - "traefik.http.routers.radarr-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.radarr-http.service=radarr"
+      # Service definition
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
 
   prowlarr:
@@ -98,8 +116,17 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
+      # HTTPS router
       - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_DOMAIN:-prowlarr.lan}`)"
-      - "traefik.http.routers.prowlarr.entrypoints=web"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.service=prowlarr"
+      # HTTP redirect router
+      - "traefik.http.routers.prowlarr-http.rule=Host(`${PROWLARR_DOMAIN:-prowlarr.lan}`)"
+      - "traefik.http.routers.prowlarr-http.entrypoints=web"
+      - "traefik.http.routers.prowlarr-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.prowlarr-http.service=prowlarr"
+      # Service definition
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
   bazarr:
@@ -132,6 +159,15 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
+      # HTTPS router
       - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_DOMAIN:-bazarr.lan}`)"
-      - "traefik.http.routers.bazarr.entrypoints=web"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.service=bazarr"
+      # HTTP redirect router
+      - "traefik.http.routers.bazarr-http.rule=Host(`${BAZARR_DOMAIN:-bazarr.lan}`)"
+      - "traefik.http.routers.bazarr-http.entrypoints=web"
+      - "traefik.http.routers.bazarr-http.middlewares=redirect-to-https"
+      - "traefik.http.routers.bazarr-http.service=bazarr"
+      # Service definition
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
