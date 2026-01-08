@@ -62,6 +62,20 @@ docker compose up -d cloudflared
 docker compose logs cloudflared
 ```
 
+### 404 on public subdomains (e.g., jellyfin.otterammo.xyz)
+If `curl -I -H "Host: jellyfin.yourdomain.xyz" http://localhost` returns 200/302 locally but the public URL returns 404, the tunnel is likely sending the wrong Host header.
+
+In Cloudflare Zero Trust:
+1. Go to **Access** → **Tunnels** → your tunnel → **Public Hostnames**
+2. For each hostname, set **Service** to `http://traefik:80`
+3. Remove the **HTTP Host Header** override, or set it to the same hostname (e.g., `jellyfin.yourdomain.xyz`)
+
+Then retest:
+```bash
+curl -I https://jellyfin.yourdomain.xyz
+curl -I https://jellyseerr.yourdomain.xyz
+```
+
 ### Verify tunnel status:
 Check the Cloudflare Zero Trust dashboard to see if your tunnel is online.
 

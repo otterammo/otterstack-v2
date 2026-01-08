@@ -6,7 +6,7 @@ services:
     networks:
       - ${NETWORK_NAME:-media-network}  # Keep for backward compatibility (Iteration 1)
       - mgmt-net                        # Management layer
-    # Removed: ports - Access via Traefik at http://dozzle.lan
+    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:8082
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
@@ -16,8 +16,9 @@ services:
       - DOZZLE_NO_ANALYTICS=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dozzle.rule=Host(`dozzle${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.dozzle.entrypoints=web"
+      - "traefik.http.routers.dozzle.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.dozzle.entrypoints=dozzle"
+      - "traefik.http.routers.dozzle.tls=true"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
     healthcheck:
       test: ["CMD", "/dozzle", "healthcheck"]

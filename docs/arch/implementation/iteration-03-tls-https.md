@@ -1,56 +1,70 @@
-# Iteration 3: TLS & HTTPS
+# Iteration 3: TLS & HTTPS (Tailscale)
 
 **Status:** Not Started
-**Duration:** 1-2 days
+**Duration:** 1 day
 **Risk Level:** Low
-**Downtime:** None
+**Downtime:** Minimal (rolling restarts)
 **Dependencies:** Iteration 2 completed
 
 ---
 
 ## Objectives
 
-1. Configure TLS certificates for all services
-2. Enable HTTPS with Let's Encrypt (for public domain)
-3. Configure self-signed certificates for local services
-4. Force HTTP to HTTPS redirects
-5. Update all service URLs to HTTPS
+1. Enable HTTPS for all services via Tailscale MagicDNS
+2. Keep Traefik as the router and use port-based TLS (no base-path changes)
+3. Reduce exposed surface to tailnet-only access
+4. Update service URLs to the new HTTPS endpoints
 
 ---
 
 ## Pre-Migration Checklist
 
 - [ ] Iteration 2 validated and stable
-- [ ] Domain name configured (for Let's Encrypt)
-- [ ] DNS pointing to server
-- [ ] Port 443 accessible from internet (if using Let's Encrypt)
+- [ ] Tailscale installed and connected on the media server
+- [ ] MagicDNS enabled for the tailnet
+- [ ] HTTPS certificates enabled in the Tailscale admin panel
+- [ ] Confirmed device name: `optiplex-7040.husky-escalator.ts.net`
 - [ ] Full system backup
-- [ ] Decide: Let's Encrypt vs Self-Signed certificates
 
 ---
 
-## Certificate Strategy
+## Certificate Strategy (Selected)
 
-### Option A: Let's Encrypt (Recommended for Public Domain)
+### Option A: Tailscale MagicDNS + HTTPS
 
-**For:** `otterammo.xyz` and subdomains
-**Benefits:** Free, automated, trusted by browsers
-**Requirements:** Public domain, ports 80/443 accessible
+**For:** Tailnet-only access via `optiplex-7040.husky-escalator.ts.net`
+**Benefits:** Publicly trusted certs, no manual CA install
+**Tradeoffs:** Requires Tailscale on clients, no `.lan` names
 
-### Option B: Self-Signed (For Local-Only Services)
+### Alternatives (not in scope for this iteration)
 
-**For:** `*.lan` domains
-**Benefits:** Works offline, no external dependencies
-**Drawbacks:** Browser warnings, manual trust
-
-### Recommended Approach: Hybrid
-
-- **Public services**: Let's Encrypt wildcard cert for `*.otterammo.xyz`
-- **Local services**: Self-signed cert for `*.lan`
+- Let's Encrypt for public domains (`*.otterammo.xyz`)
+- Self-signed certs for `.lan`
 
 ---
 
-## Traefik TLS Configuration
+## Port Map (Selected)
+
+| External Port | Service | Internal Port | Notes |
+| --- | --- | --- | --- |
+| 8096 | Jellyfin | 8096 | - |
+| 5055 | Jellyseerr | 5055 | - |
+| 8989 | Sonarr | 8989 | - |
+| 7878 | Radarr | 7878 | - |
+| 9696 | Prowlarr | 9696 | - |
+| 6767 | Bazarr | 6767 | - |
+| 8080 | qBittorrent | 8080 | - |
+| 3000 | Grafana | 3000 | - |
+| 9090 | Prometheus | 9090 | - |
+| 9093 | Alertmanager | 9093 | - |
+| 3001 | Web UI | 3000 | External port avoids conflict with Grafana |
+| 8081 | cAdvisor | 8080 | External port avoids conflict |
+| 8082 | Dozzle | 8080 | External port avoids conflict |
+| 8085 | Traefik Dashboard | 8080 | Optional |
+
+---
+
+## Traefik TLS Configuration (Tailscale)
 
 ### Update Traefik (traefik/docker-compose.yml)
 
@@ -66,26 +80,30 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=${NETWORK_NAME:-media-network}"
 
+      # File provider for TLS config
+      - "--providers.file.directory=/config"
+      - "--providers.file.watch=true"
+
       # Entry points
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-
-      # HTTP to HTTPS redirect
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-
-      # TLS configuration
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-
-      # For wildcard certs (DNS challenge)
-      # - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
-      # - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--entrypoints.jellyfin.address=:8096"
+      - "--entrypoints.jellyseerr.address=:5055"
+      - "--entrypoints.sonarr.address=:8989"
+      - "--entrypoints.radarr.address=:7878"
+      - "--entrypoints.prowlarr.address=:9696"
+      - "--entrypoints.bazarr.address=:6767"
+      - "--entrypoints.qbittorrent.address=:8080"
+      - "--entrypoints.grafana.address=:3000"
+      - "--entrypoints.prometheus.address=:9090"
+      - "--entrypoints.alertmanager.address=:9093"
+      - "--entrypoints.web-ui.address=:3001"
+      - "--entrypoints.cadvisor.address=:8081"
+      - "--entrypoints.dozzle.address=:8082"
+      - "--entrypoints.traefik-dashboard.address=:8085"
 
       # API and dashboard
       - "--api.dashboard=true"
-      - "--api.insecure=false"  # Secure dashboard
+      - "--api.insecure=false"
 
       # Health check
       - "--ping=true"
@@ -98,36 +116,25 @@ services:
 
     ports:
       - "80:80"
-      - "443:443"
+      - "8096:8096"
+      - "5055:5055"
+      - "8989:8989"
+      - "7878:7878"
+      - "9696:9696"
+      - "6767:6767"
+      - "8080:8080"
+      - "3000:3000"
+      - "9090:9090"
+      - "9093:9093"
+      - "3001:3001"
+      - "8081:8081"
+      - "8082:8082"
+      - "8085:8085"
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./logs:/var/log/traefik
-      - ./letsencrypt:/letsencrypt  # NEW: Store certificates
-      - ./config:/config            # NEW: Dynamic configuration
-
-    environment:
-      - TZ=${TZ:-UTC}
-      - DOCKER_API_VERSION=1.44
-      - ACME_EMAIL=${ACME_EMAIL}
-      # If using Cloudflare DNS challenge:
-      # - CF_API_EMAIL=${CF_API_EMAIL}
-      # - CF_API_KEY=${CF_API_KEY}
-
-    networks:
-      - dmz-net
-      - frontend-net
-      - backend-net
-      - security-net
-
-    labels:
-      - "traefik.enable=true"
-
-      # Dashboard with HTTPS
-      - "traefik.http.routers.traefik.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls=true"
-      - "traefik.http.routers.traefik.service=api@internal"
+      - ./config:/config
 ```
 
 ### Create TLS Dynamic Configuration
@@ -140,141 +147,104 @@ tls:
   options:
     default:
       minVersion: VersionTLS12
-      cipherSuites:
-        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
       sniStrict: true
-
   stores:
     default:
       defaultCertificate:
-        certFile: /config/certs/local-cert.pem
-        keyFile: /config/certs/local-key.pem
-
-  certificates:
-    # Self-signed for local services
-    - certFile: /config/certs/local-cert.pem
-      keyFile: /config/certs/local-key.pem
-      stores:
-        - default
+        certFile: /config/certs/tailscale.crt
+        keyFile: /config/certs/tailscale.key
 ```
 
----
-
-## Generate Self-Signed Certificates
-
-For `*.lan` domains:
+### Generate Tailscale Certificate
 
 ```bash
-cd /home/otterammo/media/traefik
-mkdir -p config/certs
+sudo tailscale cert \
+  --cert-file /home/otterammo/media/traefik/config/certs/tailscale.crt \
+  --key-file /home/otterammo/media/traefik/config/certs/tailscale.key \
+  optiplex-7040.husky-escalator.ts.net
+sudo chmod 600 /home/otterammo/media/traefik/config/certs/tailscale.key
+sudo chmod 644 /home/otterammo/media/traefik/config/certs/tailscale.crt
+```
 
-# Generate private key
-openssl genrsa -out config/certs/local-key.pem 2048
+### Certificate Renewal (Recommended)
 
-# Generate certificate (valid for 1 year, *.lan wildcard)
-openssl req -new -x509 -sha256 \
-  -key config/certs/local-key.pem \
-  -out config/certs/local-cert.pem \
-  -days 365 \
-  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.lan" \
-  -addext "subjectAltName=DNS:*.lan,DNS:localhost"
+Tailscale certificates are short-lived. Re-run `tailscale cert` periodically.
 
-# Secure permissions
-chmod 600 config/certs/local-key.pem
-chmod 644 config/certs/local-cert.pem
+Example cron (weekly):
 
-# Verify certificate
-openssl x509 -in config/certs/local-cert.pem -text -noout
+```bash
+sudo crontab -e
+```
+
+```cron
+0 3 * * 0 /usr/bin/tailscale cert \
+  --cert-file /home/otterammo/media/traefik/config/certs/tailscale.crt \
+  --key-file /home/otterammo/media/traefik/config/certs/tailscale.key \
+  optiplex-7040.husky-escalator.ts.net \
+  && docker compose -f /home/otterammo/media/docker-compose.yml restart traefik
 ```
 
 ---
 
 ## Update Service Labels for HTTPS
 
+### Shared Environment Variable
+
+Add to `.env`:
+
+```bash
+TAILSCALE_HOST=optiplex-7040.husky-escalator.ts.net
+```
+
 ### Template for All Services
 
 ```yaml
 labels:
   - "traefik.enable=true"
-
-  # Router configuration
-  - "traefik.http.routers.<service>.rule=Host(`<service>${DOMAIN_SUFFIX:-.lan}`)"
-  - "traefik.http.routers.<service>.entrypoints=websecure"
+  - "traefik.http.routers.<service>.rule=Host(`${TAILSCALE_HOST}`)"
+  - "traefik.http.routers.<service>.entrypoints=<entrypoint>"
   - "traefik.http.routers.<service>.tls=true"
-
-  # For Let's Encrypt (public services)
-  # - "traefik.http.routers.<service>.tls.certresolver=letsencrypt"
-
-  # Service configuration
-  - "traefik.http.services.<service>.loadbalancer.server.port=<port>"
+  - "traefik.http.services.<service>.loadbalancer.server.port=<internal_port>"
 ```
 
-### Jellyfin (jellyfin/docker-compose.yml)
+### Example (Jellyfin)
 
 ```yaml
 labels:
   - "traefik.enable=true"
-  - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN:-jellyfin.lan}`)"
-  - "traefik.http.routers.jellyfin.entrypoints=websecure"
+  - "traefik.http.routers.jellyfin.rule=Host(`${TAILSCALE_HOST}`)"
+  - "traefik.http.routers.jellyfin.entrypoints=jellyfin"
   - "traefik.http.routers.jellyfin.tls=true"
   - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
 ```
 
-### Web UI (web-ui/docker-compose.yml)
+### Traefik Dashboard Labels (Optional)
 
 ```yaml
 labels:
   - "traefik.enable=true"
-  - "traefik.docker.network=frontend-net"
-
-  # Public domain (Let's Encrypt)
-  - "traefik.http.routers.web-ui-public.rule=Host(`${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}`)"
-  - "traefik.http.routers.web-ui-public.entrypoints=websecure"
-  - "traefik.http.routers.web-ui-public.tls=true"
-  - "traefik.http.routers.web-ui-public.tls.certresolver=letsencrypt"
-  - "traefik.http.routers.web-ui-public.service=web-ui"
-
-  # Local domain (Self-signed)
-  - "traefik.http.routers.web-ui-admin.rule=Host(`dashboard${DOMAIN_SUFFIX:-.lan}`)"
-  - "traefik.http.routers.web-ui-admin.entrypoints=websecure"
-  - "traefik.http.routers.web-ui-admin.tls=true"
-  - "traefik.http.routers.web-ui-admin.service=web-ui"
-
-  # Service definition
-  - "traefik.http.services.web-ui.loadbalancer.server.port=3000"
+  - "traefik.http.routers.traefik-dashboard.rule=Host(`${TAILSCALE_HOST}`)"
+  - "traefik.http.routers.traefik-dashboard.entrypoints=traefik-dashboard"
+  - "traefik.http.routers.traefik-dashboard.tls=true"
+  - "traefik.http.routers.traefik-dashboard.service=api@internal"
 ```
 
-### Update All Other Services
+### Entry Point Map (for labels)
 
-Apply the same pattern to:
-- Jellyseerr
-- Sonarr
-- Radarr
-- Prowlarr
-- Bazarr
-- qBittorrent
-- Prometheus
-- Grafana
-- cAdvisor
-- Alertmanager
-- Dozzle
-
----
-
-## Environment Variables
-
-Add to `.env`:
-
-```bash
-# TLS Configuration
-ACME_EMAIL=your-email@example.com
-
-# Cloudflare (if using DNS challenge)
-# CF_API_EMAIL=your-email@example.com
-# CF_API_KEY=your-api-key
-```
+- Jellyfin: `jellyfin`
+- Jellyseerr: `jellyseerr`
+- Sonarr: `sonarr`
+- Radarr: `radarr`
+- Prowlarr: `prowlarr`
+- Bazarr: `bazarr`
+- qBittorrent: `qbittorrent`
+- Grafana: `grafana`
+- Prometheus: `prometheus`
+- Alertmanager: `alertmanager`
+- Web UI: `web-ui`
+- cAdvisor: `cadvisor`
+- Dozzle: `dozzle`
+- Traefik dashboard: `traefik-dashboard`
 
 ---
 
@@ -289,42 +259,27 @@ cp -r */docker-compose.yml backups/iter3-pre/
 cp docker-compose.yml backups/iter3-pre/
 ```
 
-### Step 2: Create Certificate Directories
+### Step 2: Create Certificate Directory
 
 ```bash
-mkdir -p traefik/letsencrypt
-mkdir -p traefik/config/certs
-
-# Set proper permissions
-chmod 600 traefik/letsencrypt
-touch traefik/letsencrypt/acme.json
-chmod 600 traefik/letsencrypt/acme.json
+mkdir -p /home/otterammo/media/traefik/config/certs
 ```
 
-### Step 3: Generate Self-Signed Certificates
+### Step 3: Generate Tailscale Certificate
 
 ```bash
-cd traefik
-
-# Generate certificates (as shown above)
-openssl genrsa -out config/certs/local-key.pem 2048
-openssl req -new -x509 -sha256 \
-  -key config/certs/local-key.pem \
-  -out config/certs/local-cert.pem \
-  -days 365 \
-  -subj "/C=US/ST=State/L=City/O=Media Server/CN=*.lan" \
-  -addext "subjectAltName=DNS:*.lan,DNS:localhost"
-
-chmod 600 config/certs/local-key.pem
-chmod 644 config/certs/local-cert.pem
-
-cd ..
+sudo tailscale cert \
+  --cert-file /home/otterammo/media/traefik/config/certs/tailscale.crt \
+  --key-file /home/otterammo/media/traefik/config/certs/tailscale.key \
+  optiplex-7040.husky-escalator.ts.net
+sudo chmod 600 /home/otterammo/media/traefik/config/certs/tailscale.key
+sudo chmod 644 /home/otterammo/media/traefik/config/certs/tailscale.crt
 ```
 
 ### Step 4: Create TLS Configuration File
 
 ```bash
-cat > traefik/config/tls.yml << 'EOF'
+cat > /home/otterammo/media/traefik/config/tls.yml << 'EOF'
 tls:
   options:
     default:
@@ -333,260 +288,112 @@ tls:
   stores:
     default:
       defaultCertificate:
-        certFile: /config/certs/local-cert.pem
-        keyFile: /config/certs/local-key.pem
-  certificates:
-    - certFile: /config/certs/local-cert.pem
-      keyFile: /config/certs/local-key.pem
-      stores:
-        - default
+        certFile: /config/certs/tailscale.crt
+        keyFile: /config/certs/tailscale.key
 EOF
 ```
 
 ### Step 5: Update Traefik Configuration
 
 ```bash
-nano traefik/docker-compose.yml
-# Apply changes from "Traefik TLS Configuration" section above
+nano /home/otterammo/media/traefik/docker-compose.yml
+# Apply the entrypoints, file provider, and port mappings above.
 ```
 
 ### Step 6: Update Service Labels
 
-Update each service's docker-compose.yml with HTTPS labels:
+Update each service compose file with the port-based TLS labels:
 
 ```bash
-# Jellyfin
-nano jellyfin/docker-compose.yml
-
-# Jellyseerr
-nano jellyseerr/docker-compose.yml
-
-# Web UI
-nano web-ui/docker-compose.yml
-
-# Servarr services
-nano servarr/docker-compose.yml
-
-# Download services
-nano qbittorrent/docker-compose.yml
-
-# Monitoring
-nano monitoring/docker-compose.yml
-
-# Dozzle
-nano dozzle/docker-compose.yml
+nano /home/otterammo/media/jellyfin/docker-compose.yml
+nano /home/otterammo/media/jellyseerr/docker-compose.yml
+nano /home/otterammo/media/servarr/docker-compose.yml
+nano /home/otterammo/media/qbittorrent/docker-compose.yml
+nano /home/otterammo/media/monitoring/docker-compose.yml
+nano /home/otterammo/media/dozzle/docker-compose.yml
+nano /home/otterammo/media/web-ui/docker-compose.yml
 ```
 
-### Step 7: Update .env File
+### Step 7: Update .env
 
 ```bash
-nano .env
-
-# Add:
-ACME_EMAIL=your-email@example.com
+nano /home/otterammo/media/.env
+# Add TAILSCALE_HOST=optiplex-7040.husky-escalator.ts.net
 ```
 
 ### Step 8: Deploy Changes
 
 ```bash
-# Validate configuration
-docker-compose config --quiet
+cd /home/otterammo/media
 
-# Restart Traefik first
-docker-compose up -d traefik
+docker compose config --quiet
 
-# Wait for Traefik to start
+docker compose up -d traefik
 sleep 10
 
-# Check Traefik logs
-docker-compose logs -f traefik &
-
-# Restart all services (to apply new labels)
-docker-compose up -d
-
-# Monitor for Let's Encrypt certificate requests
-docker-compose logs -f traefik | grep acme
+docker compose up -d
 ```
-
-### Step 9: Trust Self-Signed Certificate (Client-Side)
-
-For local `.lan` domains, import the certificate on client machines:
-
-**Linux:**
-```bash
-# Copy cert from server
-scp user@server:/home/otterammo/media/traefik/config/certs/local-cert.pem ~/
-
-# Install to system trust store
-sudo cp ~/local-cert.pem /usr/local/share/ca-certificates/media-server.crt
-sudo update-ca-certificates
-```
-
-**macOS:**
-```bash
-# Copy cert from server
-scp user@server:/home/otterammo/media/traefik/config/certs/local-cert.pem ~/
-
-# Add to keychain
-sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ~/local-cert.pem
-```
-
-**Windows:**
-```powershell
-# Copy cert from server to Windows machine
-# Then: certmgr.msc -> Trusted Root Certification Authorities -> Import
-```
-
-**Firefox:**
-Settings → Privacy & Security → Certificates → View Certificates → Import
 
 ---
 
 ## Validation Tests
 
-### Test 1: HTTPS Access
+### Test 1: HTTPS Access (Tailnet)
 
 ```bash
-# Test HTTPS endpoints
-curl -k https://jellyfin.lan
-curl -k https://jellyseerr.lan
-curl -k https://sonarr.lan
-curl -k https://grafana.lan
-curl -k https://dashboard.lan
-
-# Test public domain (if configured)
-curl https://otterammo.xyz
+curl -I https://optiplex-7040.husky-escalator.ts.net:8096
+curl -I https://optiplex-7040.husky-escalator.ts.net:5055
+curl -I https://optiplex-7040.husky-escalator.ts.net:8989
+curl -I https://optiplex-7040.husky-escalator.ts.net:3000
+curl -I https://optiplex-7040.husky-escalator.ts.net:3001
 ```
 
-### Test 2: HTTP Redirect
+### Test 2: Certificate Validation
 
 ```bash
-# Should redirect to HTTPS
-curl -I http://jellyfin.lan
-# Look for: Location: https://jellyfin.lan
+echo | openssl s_client -connect optiplex-7040.husky-escalator.ts.net:8096 \
+  -servername optiplex-7040.husky-escalator.ts.net 2>/dev/null | \
+  openssl x509 -noout -issuer -subject -dates
 ```
 
-### Test 3: Certificate Validation
+### Test 3: Browser Access
 
-```bash
-# Check Let's Encrypt cert (public domain)
-openssl s_client -connect otterammo.xyz:443 -servername otterammo.xyz < /dev/null | grep -A 2 "Verify return code"
-
-# Check self-signed cert (local domain)
-openssl s_client -connect jellyfin.lan:443 -servername jellyfin.lan < /dev/null | grep -A 5 "subject="
-```
-
-### Test 4: TLS Version
-
-```bash
-# Test TLS 1.2
-openssl s_client -connect jellyfin.lan:443 -tls1_2 < /dev/null
-
-# Test TLS 1.3
-openssl s_client -connect jellyfin.lan:443 -tls1_3 < /dev/null
-
-# TLS 1.0/1.1 should fail
-openssl s_client -connect jellyfin.lan:443 -tls1 < /dev/null  # Should fail
-```
-
-### Test 5: Browser Access
-
-Open in browser (after importing self-signed cert):
-- https://jellyfin.lan
-- https://jellyseerr.lan
-- https://sonarr.lan
-- https://grafana.lan
-- https://dashboard.lan
-- https://otterammo.xyz
-
-Should show secure (lock icon) without warnings.
-
----
-
-## Validation Checklist
-
-- [ ] HTTPS working for all services
-- [ ] HTTP redirects to HTTPS
-- [ ] Let's Encrypt certificate obtained (public domain)
-- [ ] Self-signed certificate deployed (local domains)
-- [ ] TLS 1.2+ enforced, TLS 1.0/1.1 blocked
-- [ ] Browsers show secure connection (after cert trust)
-- [ ] Streaming works over HTTPS
-- [ ] API calls work over HTTPS
-- [ ] No mixed content warnings
-- [ ] Certificate auto-renewal configured
+Open in a browser on a Tailscale-connected device:
+- https://optiplex-7040.husky-escalator.ts.net:8096
+- https://optiplex-7040.husky-escalator.ts.net:5055
+- https://optiplex-7040.husky-escalator.ts.net:3000
+- https://optiplex-7040.husky-escalator.ts.net:3001
 
 ---
 
 ## Troubleshooting
 
-### Issue: Let's Encrypt Challenge Failed
+### Issue: MagicDNS Name Does Not Resolve
 
-**Symptoms:**
-```
-Error: unable to get local issuer certificate
-```
+**Symptoms:** `NXDOMAIN` or timeout
 
 **Solution:**
-```bash
-# Verify domain DNS points to server
-nslookup otterammo.xyz
+- Confirm MagicDNS is enabled in the Tailscale admin panel
+- Confirm the device name in the admin panel
+- Restart Tailscale on the client
 
-# Verify port 80/443 accessible from internet
-curl -I http://otterammo.xyz
-curl -I https://otterammo.xyz
+### Issue: Certificate Generation Fails
 
-# Check Traefik logs
-docker-compose logs traefik | grep -i acme
-
-# Try DNS challenge instead of TLS challenge
-# Update traefik config to use dnschallenge
-```
-
-### Issue: Browser Shows "Not Secure"
-
-**Symptoms:**
-Browser shows SSL warning for `.lan` domains
+**Symptoms:** `tailscale cert` returns an error
 
 **Solution:**
-This is expected for self-signed certificates. Options:
-1. Import certificate to system trust store (see Step 9)
-2. Click "Advanced" → "Proceed anyway" (not recommended for production)
-3. Use Let's Encrypt for all domains (requires public DNS)
+- Confirm HTTPS certificates are enabled in the admin panel
+- Confirm the device is connected to the tailnet
+- Retry `tailscale cert optiplex-7040.husky-escalator.ts.net`
 
-### Issue: Mixed Content Warnings
+### Issue: Service Reachable on HTTP but not HTTPS
 
-**Symptoms:**
-Some resources load over HTTP instead of HTTPS
+**Symptoms:** Connection refused on the TLS port
 
 **Solution:**
-```bash
-# Check service URLs in configs
-grep -r "http://" */config/
-
-# Update to use HTTPS or relative URLs
-# Example in Jellyseerr config:
-# Sonarr URL: https://sonarr.lan instead of http://sonarr.lan
-```
-
-### Issue: Certificate Not Renewing
-
-**Symptoms:**
-Let's Encrypt certificate expired
-
-**Solution:**
-```bash
-# Check acme.json
-cat traefik/letsencrypt/acme.json | jq
-
-# Manually trigger renewal
-docker-compose restart traefik
-
-# Check renewal logs
-docker-compose logs traefik | grep -i renew
-
-# Verify renewal cron (Let's Encrypt certs auto-renew every 60 days)
-```
+- Verify Traefik entrypoints and port mappings
+- Verify the router `entrypoints` match the service port
+- Check Traefik logs: `docker compose logs traefik`
 
 ---
 
@@ -594,17 +401,16 @@ docker-compose logs traefik | grep -i renew
 
 ```bash
 # Stop services
-docker-compose down
+docker compose down
 
 # Restore previous configuration
 cp -r backups/iter3-pre/* .
 
-# Remove TLS config
-rm -rf traefik/letsencrypt
+# Remove Tailscale TLS config
 rm -rf traefik/config
 
 # Restart
-docker-compose up -d
+docker compose up -d
 ```
 
 ---
@@ -612,33 +418,29 @@ docker-compose up -d
 ## Post-Migration Tasks
 
 ### Immediate
-- [ ] Update bookmarks to use https://
-- [ ] Test certificate renewal process
-- [ ] Monitor Traefik logs for TLS errors
-- [ ] Update documentation with HTTPS URLs
+
+- [ ] Update bookmarks to the new Tailscale HTTPS URLs
+- [ ] Update external URL settings inside services (Jellyfin, Sonarr, etc.)
+- [ ] Verify access from MacBook and iPhone
 
 ### Within 1 Week
-- [ ] Set up certificate expiry monitoring
-- [ ] Configure HSTS headers (optional)
-- [ ] Test from external network
-- [ ] Prepare for Iteration 4 (Authentication)
+
+- [ ] Add certificate renewal automation
+- [ ] Add monitoring/alerts for cert expiry
+- [ ] Remove any legacy `.lan` references if no longer needed
 
 ---
 
 ## Success Criteria
 
-✅ **Iteration 3 is successful if:**
-
-1. All services accessible via HTTPS
-2. HTTP automatically redirects to HTTPS
-3. Valid certificates (Let's Encrypt or trusted self-signed)
-4. TLS 1.2+ enforced
-5. No browser security warnings (after cert import)
-6. Zero downtime during migration
-7. Certificate auto-renewal configured
+1. All services accessible via HTTPS at `optiplex-7040.husky-escalator.ts.net:<port>`
+2. Certificates are valid and trusted (no browser warnings)
+3. Tailnet-only access works from MacBook and iPhone
+4. No base-path regressions in apps
+5. Minimal downtime during migration
 
 ---
 
 ## Next Steps
 
-**Ready for next iteration?** → [Iteration 4: Authentication Layer](iteration-04-authentication.md)
+Ready for next iteration? See [Iteration 4: Authentication Layer](iteration-04-authentication.md)

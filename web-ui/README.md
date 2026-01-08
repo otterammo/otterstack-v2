@@ -37,9 +37,12 @@ Modern Next.js-based web interface for the Media Stack that replaces both the pr
 # Timezone
 TZ=UTC
 
-# Domain configuration
-DOMAIN_SUFFIX=.lan
+# Public domain
 PUBLIC_DASHBOARD_DOMAIN=otterammo.xyz
+
+# Local access (used for admin links)
+TAILSCALE_HOST=optiplex-7040.husky-escalator.ts.net
+SERVER_IP=192.168.86.111
 
 # Admin authentication
 ADMIN_PASSWORD=your-secure-password-here
@@ -107,14 +110,14 @@ docker compose up -d
 
 ### Access
 
-- **Public Site**: http://otterammo.xyz (or your configured domain)
-- **Admin Site**: http://dashboard.lan (or your configured domain)
+- **Public Site**: https://otterammo.xyz (or your configured domain)
+- **Admin Site**: https://<TAILSCALE_HOST>:3001 (or http://<SERVER_IP>:3001)
 
 ### Traefik Integration
 
 The service exposes two Traefik routes:
 1. Public route on the main domain (`PUBLIC_DASHBOARD_DOMAIN`)
-2. Admin route on local domain (`dashboard${DOMAIN_SUFFIX}`)
+2. Admin route on the Tailscale host (`TAILSCALE_HOST`) via the `web-ui` entrypoint
 
 ## Security
 

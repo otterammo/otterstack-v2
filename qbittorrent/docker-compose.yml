@@ -32,10 +32,11 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     ports:
-      # Removed: 8080:8080 - qBittorrent WebUI via Traefik at http://qbittorrent.lan
+      # Removed: 8080:8080 - qBittorrent WebUI via Traefik at https://${TAILSCALE_HOST}:8080
       - "6881:6881"      # BitTorrent traffic (TCP)
       - "6881:6881/udp"  # BitTorrent traffic (UDP)
     environment:
+      - FIREWALL_INPUT_PORTS=${FIREWALL_INPUT_PORTS:-8080}
       - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.18.0.0/16,172.20.0.0/16,192.168.1.0/24}
       - FIREWALL_VPN_INPUT_PORTS=${VPN_INPUT_PORTS:-6881}
       - HEALTH_TARGET_ADDRESS=1.1.1.1:443
@@ -61,8 +62,9 @@ services:
     labels:
       - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.rule=Host(`${QBITTORRENT_DOMAIN:-qbittorrent.lan}`)"
-      - "traefik.http.routers.qbittorrent.entrypoints=web"
+      - "traefik.http.routers.qbittorrent.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.qbittorrent.entrypoints=qbittorrent"
+      - "traefik.http.routers.qbittorrent.tls=true"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 
   autoheal:

@@ -3,31 +3,27 @@ services:
     build: .
     container_name: media-web-ui
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://dashboard.lan or https://otterammo.xyz
+    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:3001
     networks:
       - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User-facing dashboard
     environment:
       - TZ=${TZ:-UTC}
-      - DOMAIN_SUFFIX=${DOMAIN_SUFFIX:-.lan}
       - PUBLIC_DASHBOARD_DOMAIN=${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}
+      - TAILSCALE_HOST=${TAILSCALE_HOST}
       - SERVER_IP=${SERVER_IP:-192.168.86.111}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=media-network"
-      
-      # Public site routing (primary domain)
+
       - "traefik.http.routers.web-ui-public.rule=Host(`${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}`)"
       - "traefik.http.routers.web-ui-public.entrypoints=web"
       - "traefik.http.routers.web-ui-public.service=web-ui"
-      
-      # Admin site routing (local domain)
-      - "traefik.http.routers.web-ui-admin.rule=Host(`dashboard${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.web-ui-admin.entrypoints=web"
-      - "traefik.http.routers.web-ui-admin.service=web-ui"
-      
-      # Service definition
+
+      - "traefik.http.routers.web-ui.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.web-ui.entrypoints=web-ui"
+      - "traefik.http.routers.web-ui.tls=true"
       - "traefik.http.services.web-ui.loadbalancer.server.port=3000"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3000"]
