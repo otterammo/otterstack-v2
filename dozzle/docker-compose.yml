@@ -16,17 +16,8 @@ services:
       - DOZZLE_NO_ANALYTICS=true
     labels:
       - "traefik.enable=true"
-      # HTTPS router
       - "traefik.http.routers.dozzle.rule=Host(`dozzle${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.dozzle.entrypoints=websecure"
-      - "traefik.http.routers.dozzle.tls=true"
-      - "traefik.http.routers.dozzle.service=dozzle"
-      # HTTP redirect router
-      - "traefik.http.routers.dozzle-http.rule=Host(`dozzle${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.dozzle-http.entrypoints=web"
-      - "traefik.http.routers.dozzle-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.dozzle-http.service=dozzle"
-      # Service definition
+      - "traefik.http.routers.dozzle.entrypoints=web"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
     healthcheck:
       test: ["CMD", "/dozzle", "healthcheck"]

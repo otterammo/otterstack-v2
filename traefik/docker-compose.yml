@@ -8,22 +8,17 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=${NETWORK_NAME:-media-network}"
-
-      # File provider for TLS config
-      - "--providers.file.directory=/config"
-      - "--providers.file.watch=true"
-
+      
       # Entry points
       - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-
+      
       # API and dashboard
       - "--api.dashboard=true"
-      - "--api.insecure=false"
-
+      - "--api.insecure=true"
+      
       # Health check endpoint
       - "--ping=true"
-
+      
       # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
@@ -36,7 +31,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./logs:/var/log/traefik
-      - ./config:/config
     environment:
       - TZ=${TZ:-UTC}
       - DOCKER_API_VERSION=1.44
@@ -54,16 +48,6 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
-      # HTTPS router for dashboard
       - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
-      - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=web"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
-      # HTTP redirect router
-      - "traefik.http.routers.traefik-dashboard-http.rule=Host(`traefik${DOMAIN_SUFFIX:-.lan}`)"
-      - "traefik.http.routers.traefik-dashboard-http.entrypoints=web"
-      - "traefik.http.routers.traefik-dashboard-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.traefik-dashboard-http.service=api@internal"
-      # Redirect middleware (defined once, reusable by all services)
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"

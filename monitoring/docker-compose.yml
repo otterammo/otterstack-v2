@@ -40,17 +40,8 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      # HTTPS router
       - "traefik.http.routers.prometheus.rule=Host(`prometheus.lan`)"
-      - "traefik.http.routers.prometheus.entrypoints=websecure"
-      - "traefik.http.routers.prometheus.tls=true"
-      - "traefik.http.routers.prometheus.service=prometheus"
-      # HTTP redirect router
-      - "traefik.http.routers.prometheus-http.rule=Host(`prometheus.lan`)"
-      - "traefik.http.routers.prometheus-http.entrypoints=web"
-      - "traefik.http.routers.prometheus-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.prometheus-http.service=prometheus"
-      # Service definition
+      - "traefik.http.routers.prometheus.entrypoints=web"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   grafana:
@@ -90,17 +81,8 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      # HTTPS router
       - "traefik.http.routers.grafana.rule=Host(`grafana.lan`)"
-      - "traefik.http.routers.grafana.entrypoints=websecure"
-      - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.service=grafana"
-      # HTTP redirect router
-      - "traefik.http.routers.grafana-http.rule=Host(`grafana.lan`)"
-      - "traefik.http.routers.grafana-http.entrypoints=web"
-      - "traefik.http.routers.grafana-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.grafana-http.service=grafana"
-      # Service definition
+      - "traefik.http.routers.grafana.entrypoints=web"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   cadvisor:
@@ -128,17 +110,8 @@ services:
       - mgmt-net          # Management layer
     labels:
       - "traefik.enable=true"
-      # HTTPS router
       - "traefik.http.routers.cadvisor.rule=Host(`cadvisor.lan`)"
-      - "traefik.http.routers.cadvisor.entrypoints=websecure"
-      - "traefik.http.routers.cadvisor.tls=true"
-      - "traefik.http.routers.cadvisor.service=cadvisor"
-      # HTTP redirect router
-      - "traefik.http.routers.cadvisor-http.rule=Host(`cadvisor.lan`)"
-      - "traefik.http.routers.cadvisor-http.entrypoints=web"
-      - "traefik.http.routers.cadvisor-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.cadvisor-http.service=cadvisor"
-      # Service definition
+      - "traefik.http.routers.cadvisor.entrypoints=web"
       - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
 
   node-exporter:
@@ -210,15 +183,6 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      # HTTPS router
       - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.lan`)"
-      - "traefik.http.routers.alertmanager.entrypoints=websecure"
-      - "traefik.http.routers.alertmanager.tls=true"
-      - "traefik.http.routers.alertmanager.service=alertmanager"
-      # HTTP redirect router
-      - "traefik.http.routers.alertmanager-http.rule=Host(`alertmanager.lan`)"
-      - "traefik.http.routers.alertmanager-http.entrypoints=web"
-      - "traefik.http.routers.alertmanager-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.alertmanager-http.service=alertmanager"
-      # Service definition
+      - "traefik.http.routers.alertmanager.entrypoints=web"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"

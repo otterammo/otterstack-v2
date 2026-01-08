@@ -30,19 +30,6 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      # HTTPS router for local .lan access
-      - "traefik.http.routers.jellyseerr.rule=Host(`${JELLYSEERR_DOMAIN:-jellyseerr.lan}`) || Host(`jellyseerr.local`)"
-      - "traefik.http.routers.jellyseerr.entrypoints=websecure"
-      - "traefik.http.routers.jellyseerr.tls=true"
-      - "traefik.http.routers.jellyseerr.service=jellyseerr"
-      # HTTP router for Cloudflare tunnel (public domain)
-      - "traefik.http.routers.jellyseerr-public.rule=Host(`${PUBLIC_JELLYSEERR_DOMAIN:-jellyseerr.otterammo.xyz}`)"
-      - "traefik.http.routers.jellyseerr-public.entrypoints=web"
-      - "traefik.http.routers.jellyseerr-public.service=jellyseerr"
-      # HTTP redirect for local domain only
-      - "traefik.http.routers.jellyseerr-http.rule=Host(`${JELLYSEERR_DOMAIN:-jellyseerr.lan}`) || Host(`jellyseerr.local`)"
-      - "traefik.http.routers.jellyseerr-http.entrypoints=web"
-      - "traefik.http.routers.jellyseerr-http.middlewares=redirect-to-https"
-      - "traefik.http.routers.jellyseerr-http.service=jellyseerr"
-      # Service definition
+      - "traefik.http.routers.jellyseerr.rule=Host(`${JELLYSEERR_DOMAIN:-jellyseerr.lan}`) || Host(`jellyseerr.local`) || Host(`${PUBLIC_JELLYSEERR_DOMAIN:-jellyseerr.otterammo.xyz}`)"
+      - "traefik.http.routers.jellyseerr.entrypoints=web"
       - "traefik.http.services.jellyseerr.loadbalancer.server.port=5055"
