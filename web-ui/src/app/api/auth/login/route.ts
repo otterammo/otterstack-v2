@@ -1,7 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { readFileSync } from 'fs'
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'
+function getAdminPassword(): string {
+  const passwordFile = process.env.ADMIN_PASSWORD_FILE
+  if (passwordFile) {
+    try {
+      return readFileSync(passwordFile, 'utf8').trim()
+    } catch {
+      console.error('Failed to read ADMIN_PASSWORD_FILE')
+    }
+  }
+  return process.env.ADMIN_PASSWORD || 'admin'
+}
+
+const ADMIN_PASSWORD = getAdminPassword()
 const SESSION_COOKIE = 'admin_session'
 
 export async function POST(request: NextRequest) {

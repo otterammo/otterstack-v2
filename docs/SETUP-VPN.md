@@ -39,7 +39,7 @@ Port forwarding improves seeding performance by allowing incoming connections:
 2. Request a port (you'll receive a random port number, e.g., 51820)
 3. Note this port number for configuration
 
-## Step 3: Configure Environment Variables
+## Step 3: Configure WireGuard Secrets and Environment Variables
 
 1. Open your `.env` file (or create it from `.env.template`):
    ```bash
@@ -48,14 +48,20 @@ Port forwarding improves seeding performance by allowing incoming connections:
    nano .env
    ```
 
-2. Add/update these VPN-related variables:
+2. Save the WireGuard private key as a Docker secret:
+   ```bash
+   # Replace with the PrivateKey from the Mullvad config (single line)
+   printf '%s' 'abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx=' > secrets/wireguard_private_key
+   chmod 600 secrets/wireguard_private_key
+   ```
+
+3. Add/update these VPN-related variables:
    ```bash
    # VPN Configuration
    VPN_PROVIDER=mullvad
    VPN_TYPE=wireguard
    
-   # Paste your credentials from Step 1
-   WIREGUARD_PRIVATE_KEY='abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx='
+   # Paste your address from Step 1
    WIREGUARD_ADDRESSES=10.67.123.45/32
    
    # Choose a server city close to you
@@ -69,7 +75,7 @@ Port forwarding improves seeding performance by allowing incoming connections:
    FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
    ```
 
-3. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
+4. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
    ```bash
    cd /home/otterammo/media
    docker compose up -d gluetun
@@ -118,6 +124,12 @@ Look for messages like:
 INFO [vpn] You are running on the bleeding edge of latest!
 INFO [ip getter] Public IP address is x.x.x.x (Mullvad)
 INFO [vpn] Connected!
+```
+
+### Confirm Secret Mount
+
+```bash
+docker exec gluetun ls -l /run/secrets
 ```
 
 ### Verify IP Address
@@ -292,9 +304,10 @@ The private key displayed in the Mullvad web console is **different** from the a
 2. Download the WireGuard configuration (don't just copy from the web page)
 3. Extract the downloaded archive (`.zip` or `.conf` file)
 4. Open the config file and find the **actual** `PrivateKey` value
-5. Update your `.env` file with this private key:
+5. Update the WireGuard secret with this private key:
    ```bash
-   WIREGUARD_PRIVATE_KEY='<key from config file>'
+   printf '%s' '<key from config file>' > secrets/wireguard_private_key
+   chmod 600 secrets/wireguard_private_key
    ```
 6. Recreate the container:
    ```bash

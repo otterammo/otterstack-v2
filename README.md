@@ -93,11 +93,12 @@ This stack includes Gluetun VPN integration to protect qBittorrent torrent traff
 
 1. Sign up for [Mullvad VPN](https://mullvad.net/)
 2. Generate WireGuard credentials in your Mullvad account
-3. Add credentials to `.env` file:
-   ```bash
-   WIREGUARD_PRIVATE_KEY=your_private_key
-   WIREGUARD_ADDRESSES=10.x.x.x/32
-   ```
+3. Store WireGuard credentials:
+   - Save the Mullvad `PrivateKey` to `secrets/wireguard_private_key` (single line)
+   - Add the address to `.env`:
+     ```bash
+     WIREGUARD_ADDRESSES=10.x.x.x/32
+     ```
 4. Start the services:
    ```bash
    cd qbittorrent

@@ -35,6 +35,8 @@ services:
       # Removed: 8080:8080 - qBittorrent WebUI via Traefik at https://${TAILSCALE_HOST}:8080
       - "6881:6881"      # BitTorrent traffic (TCP)
       - "6881:6881/udp"  # BitTorrent traffic (UDP)
+    secrets:
+      - wireguard_private_key
     environment:
       - FIREWALL_INPUT_PORTS=${FIREWALL_INPUT_PORTS:-8080}
       - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.18.0.0/16,172.20.0.0/16,192.168.1.0/24}
@@ -47,7 +49,6 @@ services:
       - VPN_SERVICE_PROVIDER=${VPN_PROVIDER:-mullvad}
       - VPN_TYPE=${VPN_TYPE:-wireguard}
       - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
-      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
     volumes:
       - ./gluetun:/gluetun
     networks:

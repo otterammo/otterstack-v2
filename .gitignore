@@ -6,9 +6,15 @@ data/
 node_modules/
 redis-data/
 
+# Secrets
+secrets/
+
 # Fail2ban
 fail2ban/fail2ban-db/
 fail2ban/config/jail.local
 
 # Traefik logs
 traefik/logs/
+
+# Agent Instructions
+CLAUDE.md

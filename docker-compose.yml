@@ -11,3 +11,12 @@ include:
   - traefik/docker-compose.yml
   - web-ui/docker-compose.yml
   - networks.yml  # Iteration 1: Segmented network architecture
+
+# Iteration 5: File-based secrets
+secrets:
+  cloudflare_token:
+    file: ./secrets/cloudflare_token.txt
+  admin_password:
+    file: ./secrets/admin_password.txt
+  wireguard_private_key:
+    file: ./secrets/wireguard_private_key
