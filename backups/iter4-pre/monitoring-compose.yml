@@ -43,7 +43,6 @@ services:
       - "traefik.http.routers.prometheus.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.prometheus.entrypoints=prometheus"
       - "traefik.http.routers.prometheus.tls=true"
-      - "traefik.http.routers.prometheus.middlewares=authelia@docker"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   grafana:
@@ -86,7 +85,6 @@ services:
       - "traefik.http.routers.grafana.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.grafana.entrypoints=grafana"
       - "traefik.http.routers.grafana.tls=true"
-      - "traefik.http.routers.grafana.middlewares=authelia@docker"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   cadvisor:
@@ -117,7 +115,6 @@ services:
       - "traefik.http.routers.cadvisor.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.cadvisor.entrypoints=cadvisor"
       - "traefik.http.routers.cadvisor.tls=true"
-      - "traefik.http.routers.cadvisor.middlewares=authelia@docker"
       - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
 
   node-exporter:
@@ -192,5 +189,4 @@ services:
       - "traefik.http.routers.alertmanager.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.alertmanager.entrypoints=alertmanager"
       - "traefik.http.routers.alertmanager.tls=true"
-      - "traefik.http.routers.alertmanager.middlewares=authelia@docker"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"

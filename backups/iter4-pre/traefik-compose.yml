@@ -29,7 +29,6 @@ services:
       - "--entrypoints.cadvisor.address=:8081"
       - "--entrypoints.dozzle.address=:8082"
       - "--entrypoints.traefik.address=:8085"
-      - "--entrypoints.authelia.address=:9091"
 
       # API and dashboard
       - "--api.dashboard=true"
@@ -60,7 +59,6 @@ services:
       - "8081:8081"   # cAdvisor
       - "8082:8082"   # Dozzle
       - "8085:8085"   # Traefik Dashboard
-      - "9091:9091"   # Authelia
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./logs:/var/log/traefik
@@ -85,5 +83,4 @@ services:
       - "traefik.http.routers.traefik-dashboard.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=traefik"
       - "traefik.http.routers.traefik-dashboard.tls=true"
-      - "traefik.http.routers.traefik-dashboard.middlewares=authelia@docker"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"

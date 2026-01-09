@@ -23,7 +23,6 @@
 
 - [ ] Iteration 3 validated and stable
 - [ ] HTTPS working for all services
-- [ ] Full system backup
 - [ ] Decide on user accounts and access levels
 - [ ] Have authenticator app ready (Google Authenticator, Authy, etc.)
 - [ ] Document emergency access procedure

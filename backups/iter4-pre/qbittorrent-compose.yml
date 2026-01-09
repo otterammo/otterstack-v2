@@ -65,7 +65,6 @@ services:
       - "traefik.http.routers.qbittorrent.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.qbittorrent.entrypoints=qbittorrent"
       - "traefik.http.routers.qbittorrent.tls=true"
-      - "traefik.http.routers.qbittorrent.middlewares=authelia@docker"
       - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
 
   autoheal:

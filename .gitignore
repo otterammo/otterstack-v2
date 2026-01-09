@@ -4,6 +4,7 @@ cache/
 config/
 data/
 node_modules/
+redis-data/
 
 # Fail2ban
 fail2ban/fail2ban-db/
