@@ -8,8 +8,8 @@ services:
       - gluetun
     volumes:
       - ./qbittorrent/config:/config
-      - ${DOWNLOADS_PATH:-/mnt/external}/qbittorrent/downloads:/downloads
-      - ${DOWNLOADS_PATH:-/mnt/external}/qbittorrent/incomplete:/incomplete
+      - ${DOWNLOADS_PATH:-/mnt/external/downloads}:/downloads
+      - ${DOWNLOADS_PATH:-/mnt/external/downloads}/incomplete:/incomplete
     environment:
       - DOCKER_MODS=ghcr.io/vuetorrent/vuetorrent-lsio-mod:latest
       - PGID=${PGID:-1000}
