@@ -1,5 +1,6 @@
 include:
   - authelia/docker-compose.yml
+  - backup/docker-compose.yml
   - cloudflared/docker-compose.yml
   - dozzle/docker-compose.yml
   - fail2ban/docker-compose.yml

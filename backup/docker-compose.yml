@@ -1,0 +1,48 @@
+services:
+  backup:
+    image: offen/docker-volume-backup:latest
+    container_name: backup
+    restart: unless-stopped
+
+    volumes:
+      # Service configs to backup (read-only)
+      - ../jellyfin/config:/backup/jellyfin-config:ro
+      - ../jellyseerr/config:/backup/jellyseerr-config:ro
+      - ../servarr/sonarr/config:/backup/sonarr-config:ro
+      - ../servarr/radarr/config:/backup/radarr-config:ro
+      - ../servarr/prowlarr/config:/backup/prowlarr-config:ro
+      - ../servarr/bazarr/config:/backup/bazarr-config:ro
+      - ../qbittorrent/qbittorrent/config:/backup/qbittorrent-config:ro
+      - ../monitoring/prometheus/data:/backup/prometheus-data:ro
+      - ../monitoring/grafana/data:/backup/grafana-data:ro
+      - ../monitoring/loki/data:/backup/loki-data:ro
+      - ../traefik/config:/backup/traefik-config:ro
+      - ../authelia/config:/backup/authelia-config:ro
+      - ../authelia/data:/backup/authelia-data:ro
+
+      # Docker socket for container stop/start during backup
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+      # Backup destination
+      - ${BACKUP_DESTINATION:-/mnt/backups}:/archive
+
+    environment:
+      - TZ=${TZ:-UTC}
+      - BACKUP_CRON_EXPRESSION=${BACKUP_CRON:-0 2 * * *}
+      - BACKUP_FILENAME=media-server-backup-%Y%m%d-%H%M%S.tar.gz
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+      - BACKUP_PRUNING_LEEWAY=1m
+      - BACKUP_COMPRESSION=gz
+
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+    networks:
+      - mgmt-net
+
+    labels:
+      - "traefik.enable=false"

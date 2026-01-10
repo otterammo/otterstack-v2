@@ -80,7 +80,14 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.traefik-dashboard.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=traefik"

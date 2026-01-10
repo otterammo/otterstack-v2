@@ -29,6 +29,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.sonarr.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.sonarr.entrypoints=sonarr"
@@ -66,6 +67,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.radarr.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.radarr.entrypoints=radarr"
@@ -101,6 +103,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.prowlarr.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.prowlarr.entrypoints=prowlarr"
@@ -137,6 +140,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.bazarr.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.bazarr.entrypoints=bazarr"

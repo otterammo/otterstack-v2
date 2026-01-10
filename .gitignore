@@ -1,5 +1,6 @@
 .env
 .github/
+backups/
 cache/
 config/
 data/

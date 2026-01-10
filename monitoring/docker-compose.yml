@@ -39,6 +39,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.prometheus.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.prometheus.entrypoints=prometheus"
@@ -82,6 +83,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.grafana.entrypoints=grafana"
@@ -254,5 +256,27 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    labels:
+      - "traefik.enable=false"
+
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_INTERVAL=60
+      - AUTOHEAL_START_PERIOD=300
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=10
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    networks:
+      - mgmt-net
     labels:
       - "traefik.enable=false"

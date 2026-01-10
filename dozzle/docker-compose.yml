@@ -14,6 +14,18 @@ services:
       - DOZZLE_TAILSIZE=300
       - DOZZLE_FILTER=status=running
       - DOZZLE_NO_ANALYTICS=true
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.dozzle.rule=Host(`${TAILSCALE_HOST}`)"
@@ -21,9 +33,3 @@ services:
       - "traefik.http.routers.dozzle.tls=true"
       - "traefik.http.routers.dozzle.middlewares=authelia@docker"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"
-    healthcheck:
-      test: ["CMD", "/dozzle", "healthcheck"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s

@@ -32,6 +32,7 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
       - "traefik.http.routers.jellyfin-public.rule=Host(`${PUBLIC_JELLYFIN_DOMAIN:-jellyfin.otterammo.xyz}`) || Host(`${JELLYFIN_DOMAIN:-jellyfin.lan}`)"
       - "traefik.http.routers.jellyfin-public.entrypoints=web"
