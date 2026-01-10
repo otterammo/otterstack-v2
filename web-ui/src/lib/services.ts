@@ -141,6 +141,16 @@ export const SERVICES: Service[] = [
     category: 'monitoring',
     healthEndpoint: '/healthz',
   },
+  {
+    id: 'alertmanager',
+    name: 'Alertmanager',
+    description: 'Alert routing and notifications',
+    url: `http://alertmanager:9093`,
+    displayUrl: `http://${serverIP}:9093`,
+    localUrl: localUrlForPort(9093),
+    category: 'monitoring',
+    healthEndpoint: '/',
+  },
 ]
 
 export const PUBLIC_SERVICES = SERVICES.filter((s) => s.category === 'public')

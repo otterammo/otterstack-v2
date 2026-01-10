@@ -418,14 +418,14 @@ groups:
           description: "{{ $labels.name }} CPU usage is above 80%"
 
       # High memory usage
-      - alert: HighMemoryUsage
-        expr: (container_memory_usage_bytes / container_spec_memory_limit_bytes) > 0.9
+      - alert: HighContainerMemoryUsage
+        expr: (container_memory_usage_bytes{container!=""} / container_spec_memory_limit_bytes{container!=""} > 0.9) and (container_spec_memory_limit_bytes{container!=""} > 0)
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High memory usage on {{ $labels.name }}"
-          description: "{{ $labels.name }} memory usage is above 90%"
+          summary: "High memory usage in {{ $labels.container }}"
+          description: "{{ $labels.container }} memory usage is above 90%"
 
       # Disk space low
       - alert: DiskSpaceLow
