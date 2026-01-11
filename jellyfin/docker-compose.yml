@@ -32,7 +32,7 @@ services:
     labels:
       - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyfin-public.rule=Host(`${PUBLIC_JELLYFIN_DOMAIN:-jellyfin.otterammo.xyz}`) || Host(`${JELLYFIN_DOMAIN:-jellyfin.lan}`)"
+      - "traefik.http.routers.jellyfin-public.rule=Host(`${PUBLIC_JELLYFIN_DOMAIN:-jellyfin.otterammo.xyz}`)"
       - "traefik.http.routers.jellyfin-public.entrypoints=web"
       - "traefik.http.routers.jellyfin-public.service=jellyfin"
       - "traefik.http.routers.jellyfin.rule=Host(`${TAILSCALE_HOST}`)"

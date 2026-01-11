@@ -9,7 +9,6 @@ A Docker-based media management solution with automated deployment and managemen
    cp .env.example .env
    # Edit .env with your settings
    ```
-   - Default `DOMAIN_SUFFIX` is `.lan` to avoid Apple mDNS hijacking of `.local` on iOS/macOS. Change it here if you need a different internal domain.
 
 2. **Create required secrets**
    - See `secrets/README.md` for the required files and permissions.

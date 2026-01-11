@@ -273,7 +273,6 @@ graph TB
 ## 10. Access Paths
 
 - **Public access**: Cloudflared tunnel to Traefik entrypoint `web` (port 80). Hostnames map to `PUBLIC_JELLYFIN_DOMAIN`, `PUBLIC_JELLYSEERR_DOMAIN`, and `PUBLIC_DASHBOARD_DOMAIN`.
-- **Local access**: Jellyfin and Jellyseerr can also be accessed via `.lan` domains on port 80.
 - **Admin access**: `https://<TAILSCALE_HOST>:<entrypoint>` with Authelia protecting admin services.
 
 ## 11. Service Communication Patterns
