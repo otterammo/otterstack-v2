@@ -94,7 +94,7 @@ services:
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
     # Removed: ports - Access via Traefik at http://cadvisor.lan
@@ -106,7 +106,22 @@ services:
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg:/dev/kmsg
-    privileged: true
+    # Security: Replace privileged mode with minimal required capabilities
+    # See: https://github.com/google/cadvisor/issues/2493
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE      # Required for process monitoring
+      - DAC_READ_SEARCH # Required for reading /proc and /sys
+    read_only: true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     deploy:
       resources:
         limits:
