@@ -1,83 +1,37 @@
-# Cloudflared Setup
+# Cloudflared
 
-This directory contains the Docker Compose configuration for Cloudflare Tunnel (cloudflared), which provides secure remote access to your media stack without opening ports on your router.
+Cloudflare Tunnel for secure public access to the media stack without opening router ports.
 
-## Prerequisites
+See `DETAILS.md` for full setup, routing, and troubleshooting.
 
-1. A Cloudflare account
-2. A domain managed by Cloudflare
-3. Access to Cloudflare Zero Trust dashboard
+## Access
+- No UI; traffic is routed through Cloudflare Tunnel to Traefik.
+- Public hostnames should map to `http://traefik:80` with matching Host headers.
 
-## Setup Instructions
+## Configuration
+- Tunnel token secret: `secrets/cloudflare_token`
+- Cloudflare Zero Trust setup:
+  - Create a tunnel
+  - Add public hostnames (e.g. `jellyfin`, `jellyseerr`, `dashboard`)
+  - Set service to `http://traefik:80` and keep Host header matching the hostname
+- Hostnames should match `PUBLIC_JELLYFIN_DOMAIN`, `PUBLIC_JELLYSEERR_DOMAIN`, and `PUBLIC_DASHBOARD_DOMAIN` in `.env`.
 
-### 1. Create a Cloudflare Tunnel
+## Environment
+- `TZ`, `PUID`, `PGID`
+- `TUNNEL_TOKEN_FILE` is set in compose to `/run/secrets/cloudflare_token`
 
-1. Go to [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/)
-2. Navigate to **Access** > **Tunnels**
-3. Click **Create a tunnel**
-4. Choose **Cloudflared** as the connector
-5. Give your tunnel a name (e.g., "media-stack")
-6. Copy the tunnel token that's generated
-
-### 2. Configure Environment Variables
-
-1. Copy `.env.example` to `.env` in the media directory:
-   ```bash
-   cp .env.example .env
-   ```
-
-2. Save your tunnel token as a Docker secret:
-   ```bash
-   printf '%s' 'your_actual_tunnel_token_here' > secrets/cloudflare_token
-   chmod 600 secrets/cloudflare_token
-   ```
-
-### 3. Configure Tunnel Routes
-
-In the Cloudflare Zero Trust dashboard, configure routes for your public services (admin services are accessed via Tailscale): 
-
-- **jellyfin.yourdomain.com** → `http://traefik:80` (Host header: `jellyfin.yourdomain.com`)
-- **jellyseerr.yourdomain.com** → `http://traefik:80` (Host header: `jellyseerr.yourdomain.com`)
-- **dashboard.yourdomain.com** → `http://traefik:80` (Host header: `dashboard.yourdomain.com`)
-
-These hostnames should match `PUBLIC_JELLYFIN_DOMAIN`, `PUBLIC_JELLYSEERR_DOMAIN`, and `PUBLIC_DASHBOARD_DOMAIN` in `.env`.
-
-### 4. Start the Services
-
+## Start/stop
 ```bash
 docker compose up -d cloudflared
+docker compose logs -f cloudflared
 ```
-
-## Security Considerations
-
-- The cloudflared container runs with no exposed ports
-- All traffic is encrypted through Cloudflare's network
-- Consider enabling Cloudflare Access policies for additional security
-- Use strong authentication for your services
 
 ## Troubleshooting
+- Check logs: `docker compose logs cloudflared`
+- 404 on public domains usually means an incorrect Host header in Cloudflare Tunnel settings.
+- Verify tunnel status in Cloudflare Zero Trust dashboard.
 
-### Check cloudflared logs:
-```bash
-docker compose logs cloudflared
-```
-
-### 404 on public subdomains (e.g., jellyfin.otterammo.xyz)
-If `curl -I -H "Host: jellyfin.yourdomain.xyz" http://localhost` returns 200/302 locally but the public URL returns 404, the tunnel is likely sending the wrong Host header.
-
-In Cloudflare Zero Trust:
-1. Go to **Access** → **Tunnels** → your tunnel → **Public Hostnames**
-2. For each hostname, set **Service** to `http://traefik:80`
-3. Remove the **HTTP Host Header** override, or set it to the same hostname (e.g., `jellyfin.yourdomain.xyz`)
-
-Then retest:
-```bash
-curl -I https://jellyfin.yourdomain.xyz
-curl -I https://jellyseerr.yourdomain.xyz
-```
-
-### Verify tunnel status:
-Check the Cloudflare Zero Trust dashboard to see if your tunnel is online.
-
-### Test connectivity:
-Once configured, test access through your domain names.
+## Security
+- No ports are exposed on the host.
+- Protect public hostnames with Cloudflare Access policies.
+- Keep `secrets/cloudflare_token` at `600` permissions.
