@@ -1,7 +1,7 @@
 # Network Architecture
 
 ## Overview
-This document describes the current network architecture for the media server host running Docker containers orchestrated through Docker Compose. The stack uses segmented bridge networks, Traefik entrypoints with TLS, Authelia for SSO on admin services, and Cloudflared for public access. A legacy shared `media-network` remains attached to most services for Traefik discovery and transition compatibility.
+This document describes the current network architecture for the media server host running Docker containers orchestrated through Docker Compose. The stack uses segmented bridge networks, Traefik entrypoints with TLS, Authelia for SSO on admin services, and Cloudflared for public access.
 
 ## 1. Network Topology Overview
 
@@ -17,7 +17,6 @@ graph TB
     DL[Download Stack<br/>Gluetun, qBittorrent<br/>download-net]
     MGMT[Monitoring and Ops<br/>Prometheus, Grafana, Loki, Dozzle<br/>mgmt-net]
     SEC[SSO Services<br/>Authelia, Redis<br/>security-net]
-    LEGACY[Shared media-network<br/>Service discovery]
 
     INET --> CFD --> TR
     TAIL --> TR
@@ -26,7 +25,6 @@ graph TB
     BACK --> DL
     TR --> MGMT
     TR --> SEC
-    TR -.-> LEGACY
 ```
 
 ## 2. External Access and Ingress
@@ -97,11 +95,10 @@ TLS is enabled per-entrypoint. There is no dedicated port 443 entrypoint in this
 - **download-net**: Gluetun, qBittorrent (via Gluetun), Sonarr, Radarr, Prowlarr
 - **mgmt-net**: Prometheus, Alertmanager, Grafana, cAdvisor, Node Exporter, Dozzle, Loki, Promtail, Autoheal, Backup
 - **security-net**: Authelia, Redis, Traefik (auth routing)
-- **media-network**: Shared bridge for Traefik service discovery and legacy compatibility
 
 ### Network Modes
 
-- **Bridge networks**: All segmented networks above plus the shared `media-network`
+- **Bridge networks**: Segmented networks above (dmz-net, frontend-net, backend-net, download-net, mgmt-net, security-net)
 - **Host network**: `fail2ban` (needs host iptables and log access)
 - **Service network mode**: `qbittorrent` uses `network_mode: service:gluetun`
 

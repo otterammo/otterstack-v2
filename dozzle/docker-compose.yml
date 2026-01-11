@@ -4,7 +4,6 @@ services:
     container_name: dozzle
     restart: unless-stopped
     networks:
-      - ${NETWORK_NAME:-media-network}  # Keep for backward compatibility (Iteration 1)
       - mgmt-net                        # Management layer
     # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:8082
     volumes:
@@ -28,6 +27,7 @@ services:
       start_period: 10s
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=mgmt-net"
       - "traefik.http.routers.dozzle.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.dozzle.entrypoints=dozzle"
       - "traefik.http.routers.dozzle.tls=true"

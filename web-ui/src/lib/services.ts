@@ -31,7 +31,7 @@ export const SERVICES: Service[] = [
     localUrl: localUrlForPort(5055),
     publicUrl: `https://${publicJellyseerrDomain}`,
     category: 'public',
-    healthEndpoint: '/api/v1/status',
+    healthEndpoint: '/api/v1/status/appdata',
   },
   
   // Media Management

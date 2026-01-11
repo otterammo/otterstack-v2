@@ -7,8 +7,6 @@ services:
       # Enable Docker provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=${NETWORK_NAME:-media-network}"
-      
       # File provider for TLS config
       - "--providers.file.directory=/config"
       - "--providers.file.watch=true"
@@ -69,11 +67,12 @@ services:
       - TZ=${TZ:-UTC}
       - DOCKER_API_VERSION=1.44
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - dmz-net           # External access
       - frontend-net      # Route to frontend services
       - backend-net       # Route to backend services (for monitoring)
       - security-net      # Connect to security services
+      - download-net      # Route to qBittorrent via Gluetun
+      - mgmt-net          # Route to monitoring/admin utilities
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=web", "--entrypoints.web.address=:80"]
       interval: 30s

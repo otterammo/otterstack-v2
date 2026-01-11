@@ -173,7 +173,7 @@ All service URLs remain the same. The new web-ui accesses services via Traefik j
 
 1. Check service is running: `docker ps`
 2. Verify service health endpoint is correct
-3. Check network connectivity: `docker network inspect frontend-net media-network`
+3. Check network connectivity: `docker network inspect frontend-net`
 4. Review logs: `docker logs media-web-ui`
 
 ### Can't access admin dashboard

@@ -42,24 +42,12 @@ case "$1" in
             docker compose logs -f
         fi
         ;;
-    network-create)
-        echo "Creating media network..."
-        docker network create media_media-network
-        ;;
-    network-remove)
-        echo "Removing media network..."
-        docker network rm media_media-network
-        ;;
-    network-inspect)
-        echo "Inspecting media network..."
-        docker network inspect media_media-network
-        ;;
     test)
         echo "Running smoke tests..."
         ./test-stack.sh "$@"
         ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status|logs [service]|network-create|network-remove|network-inspect|test}"
+        echo "Usage: $0 {start|stop|restart|status|logs [service]|test}"
         echo ""
         echo "Services available:"
         services=$(get_services)

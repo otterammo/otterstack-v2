@@ -1,12 +1,4 @@
-# networks.yml - Segmented Network Architecture for Iteration 1
-# This file defines 6 new networks plus the legacy media-network
-
 networks:
-  # Existing network (keep for backward compatibility during transition)
-  media-network:
-    name: ${NETWORK_NAME:-media-network}
-    driver: bridge
-
   # DMZ - External-facing ingress layer
   # Services: Traefik, Cloudflared
   dmz-net:

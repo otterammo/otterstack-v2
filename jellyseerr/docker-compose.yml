@@ -17,7 +17,6 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User interface
       - backend-net       # API calls to Sonarr/Radarr
     depends_on:

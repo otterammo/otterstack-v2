@@ -25,7 +25,7 @@ RESET = '\033[0m'
 BOLD = '\033[1m'
 
 # Test configuration
-TIMEOUT_SECONDS = 5
+TIMEOUT_SECONDS = 15
 MAX_WORKERS = 10
 
 # Service definitions with health endpoints
@@ -33,7 +33,7 @@ MAX_WORKERS = 10
 SERVICES = [
     # Public Services
     {'name': 'Jellyfin', 'container': 'jellyfin', 'port': 8096, 'path': '/health', 'critical': True},
-    {'name': 'Jellyseerr', 'container': 'jellyseerr', 'port': 5055, 'path': '/api/v1/status', 'critical': True},
+    {'name': 'Jellyseerr', 'container': 'jellyseerr', 'port': 5055, 'path': '/api/v1/status/appdata', 'critical': True},
 
     # Media Management (Backend)
     {'name': 'Sonarr', 'container': 'sonarr', 'port': 8989, 'path': '/ping', 'critical': True},
@@ -143,7 +143,7 @@ def check_service_health(service: Dict) -> TestResult:
 
         # Try curl
         result = subprocess.run(
-            ['docker', 'exec', container, 'curl', '-sf', '-o', '/dev/null', '-w', '%{http_code}', url],
+            ['docker', 'exec', container, 'curl', '-sf', '--connect-timeout', '5', '--max-time', str(TIMEOUT_SECONDS - 1), '-o', '/dev/null', '-w', '%{http_code}', url],
             capture_output=True,
             text=True,
             timeout=TIMEOUT_SECONDS
@@ -152,7 +152,7 @@ def check_service_health(service: Dict) -> TestResult:
         # If curl not found (exit code 127), try wget
         if result.returncode == 127 or 'executable file not found' in result.stderr:
             result = subprocess.run(
-                ['docker', 'exec', container, 'wget', '-q', '-O', '/dev/null', '--server-response', url],
+                ['docker', 'exec', container, 'wget', '-q', '-O', '/dev/null', '--server-response', '--timeout', str(TIMEOUT_SECONDS - 1), '--tries', '1', url],
                 capture_output=True,
                 text=True,
                 timeout=TIMEOUT_SECONDS

@@ -29,7 +29,7 @@ graph TD
   B["Mullvad VPN Network<br/>WireGuard Tunnel<br/>Encrypted & Anonymized"]
   
   C["Host Machine - Linux"]
-  D["Docker Networks: media-network + segmented nets"]
+  D["Docker Networks: segmented nets"]
   
   E["Traefik<br/>Reverse Proxy<br/>Port 80 + entrypoints"]
   F["Gluetun VPN Container<br/>WireGuard Client<br/>Killswitch Firewall<br/>DNS Leak Protection"]
@@ -393,7 +393,7 @@ Request: POST http://gluetun:8080/api/v2/torrents/add
      ↓
 ┌──────────────────────────────────────────────────────────┐
 │  Docker DNS Resolution                                   │
-│  "gluetun" → 172.18.0.x (Gluetun container IP)           │
+│  "gluetun" → 172.20.3.x (Gluetun container IP)           │
 └──────────────────────────────────────────────────────────┘
      ↓
 ┌──────────────────────────────────────────────────────────┐
@@ -496,7 +496,7 @@ Normal Docker Container:
 │  Container: jellyfin                    │
 │  ┌───────────────────────────────────┐  │
 │  │  Network Namespace (Isolated)     │  │
-│  │  • eth0: 172.18.0.5               │  │
+│  │  • eth0: 172.20.1.5               │  │
 │  │  • lo: 127.0.0.1                  │  │
 │  │  • Routes: default via gateway    │  │
 │  └───────────────────────────────────┘  │
@@ -507,7 +507,7 @@ qBittorrent with network_mode: service:gluetun:
 │  Container: gluetun                                 │
 │  ┌───────────────────────────────────────────────┐  │
 │  │  Network Namespace (Shared)                   │  │
-│  │  • eth0: 172.18.0.10 (Docker network)         │  │
+│  │  • eth0: 172.20.3.10 (Docker network)         │  │
 │  │  • wg0: 10.64.x.x (WireGuard tunnel)          │  │
 │  │  • lo: 127.0.0.1                              │  │
 │  │  • Routes: default via wg0 (VPN)              │  │
@@ -556,7 +556,7 @@ Result: Only VPN traffic allowed, everything else blocked
 | Network Segment | CIDR | Purpose |
 |---|---|---|
 | Host Network | 192.168.1.0/24 | Local LAN |
-| Docker Bridge | 172.18.0.0/16 | Container communication |
+| Docker Bridge | 172.20.0.0/16 | Container communication |
 | WireGuard Tunnel | 10.64.0.0/10 | VPN internal |
 | Mullvad Public | Various | Exit IP |
 
@@ -564,7 +564,7 @@ Result: Only VPN traffic allowed, everything else blocked
 
 The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to bypass the VPN killswitch. This setting enables:
 
-- Containers on `media-network` and `download-net` to reach Gluetun:8080
+- Containers on `download-net` to reach Gluetun:8080
 - Traefik to proxy requests to qBittorrent WebUI
 - Sonarr/Radarr API communication with Gluetun
 - Local subnet access for management and monitoring
@@ -574,7 +574,7 @@ The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to
 **Configuration Example**:
 
 ```
-FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,172.20.0.0/16,192.168.1.0/24
+FIREWALL_OUTBOUND_SUBNETS=172.20.0.0/16,172.20.0.0/16,192.168.1.0/24
 ```
 
 #### WebUI Access
@@ -743,11 +743,11 @@ Diagnosis:
 Resolution:
 ┌───────────────────────────────────────────────────────────┐
 │ 1. Identify Docker network subnet:                        │
-│    docker network inspect media-network download-net      │
-│    Look for "Subnet": "172.18.0.0/16"                     │
+│    docker network inspect download-net                    │
+│    Look for "Subnet": "172.20.0.0/16"                     │
 │                                                           │
 │ 2. Update FIREWALL_OUTBOUND_SUBNETS:                      │
-│    FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24 │
+│    FIREWALL_OUTBOUND_SUBNETS=172.20.0.0/16,192.168.1.0/24 │
 │                                                           │
 │ 3. Restart Gluetun:                                       │
 │    docker-compose restart gluetun                         │

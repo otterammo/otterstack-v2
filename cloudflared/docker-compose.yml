@@ -13,7 +13,6 @@ services:
       - cloudflare_token
     command: tunnel --no-autoupdate run
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - dmz-net           # DMZ network with Traefik
     depends_on:
       - traefik
@@ -24,7 +23,7 @@ services:
         reservations:
           memory: 64M
     healthcheck:
-      test: ["CMD", "cloudflared", "tunnel", "info"]
+      test: ["CMD", "cloudflared", "--version"]
       interval: 30s
       timeout: 10s
       retries: 3

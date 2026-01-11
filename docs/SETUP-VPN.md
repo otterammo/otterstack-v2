@@ -72,7 +72,7 @@ Port forwarding improves seeding performance by allowing incoming connections:
    VPN_INPUT_PORTS=6881
    
    # Update these subnets if your network differs
-   FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,172.20.0.0/16,192.168.1.0/24
+   FIREWALL_OUTBOUND_SUBNETS=172.20.0.0/16,192.168.1.0/24
    ```
 
 4. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
@@ -83,16 +83,13 @@ Port forwarding improves seeding performance by allowing incoming connections:
 
 ## Step 4: Verify Docker Network Subnet
 
-The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnets:
+The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnets. Verify the download network:
 
 ```bash
-docker network inspect media-network download-net | grep Subnet
+docker network inspect download-net | grep Subnet
 ```
 
-You should see something like:
-```
-"Subnet": "172.18.0.0/16"
-```
+You should see the configured subnet (e.g., `172.20.3.0/24`).
 
 If the subnets are different, update `FIREWALL_OUTBOUND_SUBNETS` in your `.env` file.
 
@@ -230,7 +227,7 @@ Common issues:
 
 2. Verify Docker network subnet is correct:
    ```bash
-   docker network inspect media-network download-net | grep Subnet
+   docker network inspect download-net | grep Subnet
    ```
 
 3. Update `FIREWALL_OUTBOUND_SUBNETS` in `.env` if needed

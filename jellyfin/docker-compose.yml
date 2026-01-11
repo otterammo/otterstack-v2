@@ -23,7 +23,6 @@ services:
         reservations:
           memory: 512M
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User-facing service
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]

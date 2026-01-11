@@ -39,7 +39,7 @@ services:
       - wireguard_private_key
     environment:
       - FIREWALL_INPUT_PORTS=${FIREWALL_INPUT_PORTS:-8080}
-      - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.18.0.0/16,172.20.0.0/16,192.168.1.0/24}
+      - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS:-172.20.0.0/16,192.168.1.0/24}
       - FIREWALL_VPN_INPUT_PORTS=${VPN_INPUT_PORTS:-6881}
       - HEALTH_TARGET_ADDRESS=1.1.1.1:443
       - HTTPPROXY=off
@@ -53,7 +53,6 @@ services:
     volumes:
       - ./gluetun:/gluetun
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - download-net      # Isolated download network
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:9999"]
@@ -64,6 +63,7 @@ services:
     labels:
       - "autoheal=true"
       - "traefik.enable=true"
+      - "traefik.docker.network=download-net"
       - "traefik.http.routers.qbittorrent.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.qbittorrent.entrypoints=qbittorrent"
       - "traefik.http.routers.qbittorrent.tls=true"

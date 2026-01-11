@@ -6,16 +6,21 @@ services:
     user: "1000:1000"
     # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:3001
     networks:
-      - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User-facing dashboard
+      - backend-net       # Reach automation services for health checks
+      - download-net      # Reach qBittorrent via Gluetun for health checks
+      - mgmt-net          # Reach monitoring stack for health checks
     secrets:
       - webui_admin_password
     environment:
       - TZ=${TZ:-UTC}
+      - PUBLIC_JELLYFIN_DOMAIN=${PUBLIC_JELLYFIN_DOMAIN:-jellyfin.otterammo.xyz}
+      - PUBLIC_JELLYSEERR_DOMAIN=${PUBLIC_JELLYSEERR_DOMAIN:-jellyseerr.otterammo.xyz}
       - PUBLIC_DASHBOARD_DOMAIN=${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}
       - TAILSCALE_HOST=${TAILSCALE_HOST}
       - SERVER_IP=${SERVER_IP:-192.168.86.111}
       - ADMIN_PASSWORD_FILE=/run/secrets/webui_admin_password
+      - NODE_OPTIONS=--dns-result-order=ipv4first
     deploy:
       resources:
         limits:
@@ -30,7 +35,7 @@ services:
       start_period: 30s
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=media-network"
+      - "traefik.docker.network=frontend-net"
       - "traefik.http.routers.web-ui-public.rule=Host(`${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}`)"
       - "traefik.http.routers.web-ui-public.entrypoints=web"
       - "traefik.http.routers.web-ui-public.service=web-ui"
