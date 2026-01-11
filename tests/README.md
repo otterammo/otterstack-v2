@@ -50,6 +50,8 @@ These services **must** be healthy for tests to pass:
 - qBittorrent (download client)
 - Gluetun (VPN container)
 - Traefik (reverse proxy)
+- Authelia (SSO authentication)
+- Redis (session store for Authelia)
 - Prometheus (metrics collection)
 
 ### Non-Critical Services
@@ -166,12 +168,12 @@ OtterStack Smoke Tests
 Test Summary
 ======================================================================
 
-Total Tests: 25
-Passed: 25
+Total Tests: 28
+Passed: 28
 Failed: 0
 Pass Rate: 100.0%
 
-Completed in 3.42 seconds
+Completed in 0.79 seconds
 ```
 
 ### Verbose Mode
@@ -190,16 +192,28 @@ Shows each individual test result:
 
 ```json
 {
-  "total": 25,
-  "passed": 25,
+  "total": 28,
+  "passed": 28,
   "failed": 0,
-  "duration_seconds": 3.42,
+  "duration_seconds": 0.79,
   "results": [
     {
       "name": "Jellyfin",
       "passed": true,
       "message": "HTTP 200",
       "duration_ms": 234
+    },
+    {
+      "name": "Authelia",
+      "passed": true,
+      "message": "HTTP 200",
+      "duration_ms": 395
+    },
+    {
+      "name": "Redis",
+      "passed": true,
+      "message": "PONG response",
+      "duration_ms": 174
     }
   ]
 }
@@ -249,10 +263,29 @@ chmod +x tests/smoke_test.py
 Edit [tests/smoke_test.py](smoke_test.py) and add to the `SERVICES` list:
 
 ```python
+# HTTP health endpoint
 {
     'name': 'MyService',
-    'url': 'http://localhost:PORT/health',
+    'container': 'myservice',
+    'port': 8080,
+    'path': '/health',
     'critical': True  # or False
+}
+
+# Native healthcheck command
+{
+    'name': 'MyService',
+    'container': 'myservice',
+    'native_healthcheck': True,
+    'critical': True
+}
+
+# Custom check (like Redis)
+{
+    'name': 'MyService',
+    'container': 'myservice',
+    'redis_check': True,  # or custom_check: True
+    'critical': True
 }
 ```
 

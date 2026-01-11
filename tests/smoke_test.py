@@ -48,6 +48,10 @@ SERVICES = [
     {'name': 'Traefik', 'container': 'traefik', 'port': 80, 'path': '/ping', 'critical': True},
     {'name': 'Dozzle', 'container': 'dozzle', 'native_healthcheck': True, 'critical': False},
 
+    # Security & Authentication
+    {'name': 'Authelia', 'container': 'authelia', 'port': 9091, 'path': '/api/health', 'critical': True},
+    {'name': 'Redis', 'container': 'authelia-redis', 'redis_check': True, 'critical': True},
+
     # Monitoring
     {'name': 'Grafana', 'container': 'grafana', 'port': 3000, 'path': '/api/health', 'critical': False},
     {'name': 'Prometheus', 'container': 'prometheus', 'port': 9090, 'path': '/-/healthy', 'critical': True},
@@ -58,6 +62,8 @@ SERVICES = [
 # Critical Docker containers that must be running
 CRITICAL_CONTAINERS = [
     'traefik',
+    'authelia',
+    'authelia-redis',
     'jellyfin',
     'sonarr',
     'radarr',
@@ -87,6 +93,25 @@ def check_service_health(service: Dict) -> TestResult:
     """Check if a service is responding to health checks using docker exec"""
     name = service['name']
     container = service['container']
+
+    # Handle Redis using redis-cli PING
+    if service.get('redis_check'):
+        start_time = time.time()
+        try:
+            result = subprocess.run(
+                ['docker', 'exec', container, 'redis-cli', 'PING'],
+                capture_output=True,
+                text=True,
+                timeout=TIMEOUT_SECONDS
+            )
+            duration_ms = int((time.time() - start_time) * 1000)
+            if result.returncode == 0 and 'PONG' in result.stdout:
+                return TestResult(name, True, "PONG response", duration_ms)
+            else:
+                return TestResult(name, False, "No PONG response", duration_ms)
+        except Exception as e:
+            duration_ms = int((time.time() - start_time) * 1000)
+            return TestResult(name, False, f"Error: {str(e)}"[:50], duration_ms)
 
     # Handle services with native healthcheck commands
     if service.get('native_healthcheck'):
