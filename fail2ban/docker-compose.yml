@@ -25,6 +25,12 @@ services:
       - SSMTP_USER=${SMTP_USER:-}
       - SSMTP_PASSWORD=${SMTP_PASSWORD:-}
       - SSMTP_TLS=${SMTP_TLS:-YES}
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
     healthcheck:
       test: ["CMD", "fail2ban-client", "ping"]
       interval: 30s

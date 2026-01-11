@@ -6,16 +6,19 @@ A Docker-based media management solution with automated deployment and managemen
 
 1. **Configure Environment**
    ```bash
-   cp .env.template .env
+   cp .env.example .env
    # Edit .env with your settings
    ```
 
-2. **Make the script executable**
+2. **Create required secrets**
+   - See `secrets/README.md` for the required files and permissions.
+
+3. **Make the script executable**
    ```bash
    chmod +x media-stack.sh
    ```
 
-3. **Start the stack**
+4. **Start the stack**
    ```bash
    ./media-stack.sh start
    ```
@@ -41,9 +44,10 @@ This stack includes Cloudflare Tunnel (cloudflared) for secure remote access wit
 ### Setup Cloudflare Tunnel
 
 1. **Create a tunnel** in the [Cloudflare Zero Trust Dashboard](https://one.dash.cloudflare.com/)
-2. **Configure your tunnel token** in the `.env` file:
+2. **Configure your tunnel token** as a Docker secret:
    ```bash
-   CLOUDFLARE_TUNNEL_TOKEN=your_tunnel_token_here
+   printf '%s' 'your_tunnel_token_here' > secrets/cloudflare_token
+   chmod 600 secrets/cloudflare_token
    ```
 3. **Set up tunnel routes** in the Cloudflare dashboard for your services
 4. **Start the cloudflared service**:
@@ -52,6 +56,14 @@ This stack includes Cloudflare Tunnel (cloudflared) for secure remote access wit
    ```
 
 For detailed setup instructions, see `cloudflared/README.md`.
+
+## Documentation
+
+- Architecture overview: `docs/NETWORK_ARCHITECTURE.md`
+- VPN setup: `docs/SETUP-VPN.md`
+- VPN deep dive: `docs/VPN-ARCHITECTURE.md`
+- Monitoring: `monitoring/README.md`
+- Secrets: `secrets/README.md`
 
 ## Security with Fail2ban
 
@@ -92,11 +104,12 @@ This stack includes Gluetun VPN integration to protect qBittorrent torrent traff
 
 1. Sign up for [Mullvad VPN](https://mullvad.net/)
 2. Generate WireGuard credentials in your Mullvad account
-3. Add credentials to `.env` file:
-   ```bash
-   WIREGUARD_PRIVATE_KEY=your_private_key
-   WIREGUARD_ADDRESSES=10.x.x.x/32
-   ```
+3. Store WireGuard credentials:
+   - Save the Mullvad `PrivateKey` to `secrets/wireguard_private_key` (single line)
+   - Add the address to `.env`:
+     ```bash
+     WIREGUARD_ADDRESSES=10.x.x.x/32
+     ```
 4. Start the services:
    ```bash
    cd qbittorrent
@@ -106,4 +119,3 @@ This stack includes Gluetun VPN integration to protect qBittorrent torrent traff
 For detailed setup instructions, see [SETUP-VPN.md](./docs/SETUP-VPN.md).
 
 For architecture details, see [VPN-ARCHITECTURE.md](./docs/VPN-ARCHITECTURE.md).
-

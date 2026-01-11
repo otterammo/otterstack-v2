@@ -3,11 +3,7 @@ services:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
-    ports:
-      - "8096:8096"
-      - "8920:8920" # HTTPS
-      - "7359:7359/udp" # Auto-discovery
-      - "1900:1900/udp" # DLNA
+    # Note: DLNA (1900/udp) and auto-discovery (7359/udp) disabled - configure clients manually
     volumes:
       - ./config:/config
       - ./cache:/cache
@@ -18,7 +14,7 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - JELLYFIN_PublishedServerUrl=http://${JELLYFIN_DOMAIN:-jellyfin.local}
+      - JELLYFIN_PublishedServerUrl=https://${TAILSCALE_HOST}:8096
     deploy:
       resources:
         limits:
@@ -26,7 +22,7 @@ services:
         reservations:
           memory: 512M
     networks:
-      - media-network
+      - frontend-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s
@@ -34,7 +30,12 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN:-jellyfin.local}`)"
-      - "traefik.http.routers.jellyfin.entrypoints=web"
+      - "traefik.http.routers.jellyfin-public.rule=Host(`${PUBLIC_JELLYFIN_DOMAIN:-jellyfin.otterammo.xyz}`)"
+      - "traefik.http.routers.jellyfin-public.entrypoints=web"
+      - "traefik.http.routers.jellyfin-public.service=jellyfin"
+      - "traefik.http.routers.jellyfin.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=jellyfin"
+      - "traefik.http.routers.jellyfin.tls=true"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"

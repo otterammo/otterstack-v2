@@ -4,8 +4,6 @@ services:
     container_name: prometheus
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    ports:
-      - "9090:9090"
     volumes:
       - ./prometheus/config:/etc/prometheus
       - ./prometheus/data:/prometheus
@@ -28,7 +26,10 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network
+      - mgmt-net
+      - frontend-net
+      - backend-net
+      - download-net
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9090/"]
       interval: 30s
@@ -36,9 +37,12 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(`prometheus.local`)"
-      - "traefik.http.routers.prometheus.entrypoints=web"
+      - "traefik.http.routers.prometheus.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.prometheus.entrypoints=prometheus"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.routers.prometheus.middlewares=authelia@docker"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   grafana:
@@ -46,8 +50,6 @@ services:
     container_name: grafana
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
-    ports:
-      - "3001:3000"
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
@@ -58,7 +60,9 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
+    secrets:
+      - grafana_admin_password
     deploy:
       resources:
         limits:
@@ -66,7 +70,8 @@ services:
         reservations:
           memory: 64M
     networks:
-      - media-network
+      - mgmt-net
+      - frontend-net
     depends_on:
       - prometheus
     healthcheck:
@@ -76,17 +81,18 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(`grafana.local`)"
-      - "traefik.http.routers.grafana.entrypoints=web"
+      - "traefik.http.routers.grafana.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.grafana.entrypoints=grafana"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.middlewares=authelia@docker"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.47.0
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
-    ports:
-      - "8081:8080"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -95,7 +101,22 @@ services:
       - /dev/disk/:/dev/disk:ro
     devices:
       - /dev/kmsg:/dev/kmsg
-    privileged: true
+    # Security: Replace privileged mode with minimal required capabilities
+    # See: https://github.com/google/cadvisor/issues/2493
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE      # Required for process monitoring
+      - DAC_READ_SEARCH # Required for reading /proc and /sys
+    read_only: true
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     deploy:
       resources:
         limits:
@@ -103,19 +124,19 @@ services:
         reservations:
           memory: 64M
     networks:
-      - media-network
+      - mgmt-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cadvisor.rule=Host(`cadvisor.local`)"
-      - "traefik.http.routers.cadvisor.entrypoints=web"
+      - "traefik.http.routers.cadvisor.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.cadvisor.entrypoints=cadvisor"
+      - "traefik.http.routers.cadvisor.tls=true"
+      - "traefik.http.routers.cadvisor.middlewares=authelia@docker"
       - "traefik.http.services.cadvisor.loadbalancer.server.port=8080"
 
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
-    ports:
-      - "9100:9100"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -136,7 +157,7 @@ services:
         reservations:
           memory: 32M
     networks:
-      - media-network
+      - mgmt-net
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9100/"]
       interval: 30s
@@ -151,8 +172,6 @@ services:
     container_name: alertmanager
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    ports:
-      - "9093:9093"
     volumes:
       - ./alertmanager/config:/etc/alertmanager
       - ./alertmanager/data:/alertmanager
@@ -170,7 +189,7 @@ services:
         reservations:
           memory: 32M
     networks:
-      - media-network
+      - mgmt-net
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9093/"]
       interval: 30s
@@ -179,6 +198,93 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alertmanager.rule=Host(`alertmanager.local`)"
-      - "traefik.http.routers.alertmanager.entrypoints=web"
+      - "traefik.http.routers.alertmanager.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.alertmanager.entrypoints=alertmanager"
+      - "traefik.http.routers.alertmanager.tls=true"
+      - "traefik.http.routers.alertmanager.middlewares=authelia@docker"
       - "traefik.http.services.alertmanager.loadbalancer.server.port=9093"
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    # Port 3100 exposed only to mgmt-net (not via Traefik)
+    # Access via: http://loki:3100 from Grafana/Promtail on mgmt-net
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yml:ro
+      - ./loki/data:/loki
+    environment:
+      - TZ=${TZ:-UTC}
+    command: -config.file=/etc/loki/loki-config.yml
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+    networks:
+      - mgmt-net
+    healthcheck:
+      test: ["CMD", "loki", "-config.file=/etc/loki/loki-config.yml", "-verify-config"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=false"
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    user: "0:0"  # Run as root to read all logs
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ../traefik/logs:/traefik-logs:ro
+    environment:
+      - TZ=${TZ:-UTC}
+    command: -config.file=/etc/promtail/promtail-config.yml
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    networks:
+      - mgmt-net
+    depends_on:
+      - loki
+    healthcheck:
+      test: ["CMD", "promtail", "-config.file=/etc/promtail/promtail-config.yml", "-check-syntax"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=false"
+
+  autoheal:
+    image: willfarrell/autoheal:latest
+    container_name: autoheal
+    restart: unless-stopped
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=autoheal
+      - AUTOHEAL_INTERVAL=60
+      - AUTOHEAL_START_PERIOD=300
+      - AUTOHEAL_DEFAULT_STOP_TIMEOUT=10
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 32M
+    networks:
+      - mgmt-net
+      - download-net
+    labels:
+      - "traefik.enable=false"

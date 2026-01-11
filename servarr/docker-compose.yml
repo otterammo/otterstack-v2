@@ -3,8 +3,6 @@ services:
     image: linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
-    ports:
-      - "8989:8989"
     volumes:
       - ./sonarr/config:/config
       - ${TV_PATH:-/mnt/external/tv}:/tv
@@ -20,7 +18,8 @@ services:
         reservations:
           memory: 256M
     networks:
-      - media-network
+      - backend-net
+      - download-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8989/ping"]
       interval: 30s
@@ -28,17 +27,18 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.sonarr.rule=Host(`${SONARR_DOMAIN:-sonarr.local}`)"
-      - "traefik.http.routers.sonarr.entrypoints=web"
+      - "traefik.http.routers.sonarr.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.sonarr.entrypoints=sonarr"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.routers.sonarr.middlewares=authelia@docker"
       - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
 
   radarr:
     image: linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
-    ports:
-      - "7878:7878"
     volumes:
       - ./radarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies
@@ -54,7 +54,8 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network
+      - backend-net
+      - download-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7878/ping"]
       interval: 30s
@@ -62,17 +63,18 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.radarr.rule=Host(`${RADARR_DOMAIN:-radarr.local}`)"
-      - "traefik.http.routers.radarr.entrypoints=web"
+      - "traefik.http.routers.radarr.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.radarr.entrypoints=radarr"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.routers.radarr.middlewares=authelia@docker"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"
 
   prowlarr:
     image: linuxserver/prowlarr:latest
     container_name: prowlarr
     restart: unless-stopped
-    ports:
-      - "9696:9696"
     volumes:
       - ./prowlarr/config:/config
     environment:
@@ -86,7 +88,8 @@ services:
         reservations:
           memory: 64M
     networks:
-      - media-network
+      - backend-net
+      - download-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9696/ping"]
       interval: 30s
@@ -94,17 +97,18 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.prowlarr.rule=Host(`${PROWLARR_DOMAIN:-prowlarr.local}`)"
-      - "traefik.http.routers.prowlarr.entrypoints=web"
+      - "traefik.http.routers.prowlarr.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.prowlarr.entrypoints=prowlarr"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.routers.prowlarr.middlewares=authelia@docker"
       - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
 
   bazarr:
     image: linuxserver/bazarr:latest
     container_name: bazarr
     restart: unless-stopped
-    ports:
-      - "6767:6767"
     volumes:
       - ./bazarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies
@@ -120,7 +124,7 @@ services:
         reservations:
           memory: 128M
     networks:
-      - media-network
+      - backend-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6767/ping"]
       interval: 30s
@@ -128,7 +132,10 @@ services:
       retries: 3
       start_period: 40s
     labels:
+      - "autoheal=true"
       - "traefik.enable=true"
-      - "traefik.http.routers.bazarr.rule=Host(`${BAZARR_DOMAIN:-bazarr.local}`)"
-      - "traefik.http.routers.bazarr.entrypoints=web"
+      - "traefik.http.routers.bazarr.rule=Host(`${TAILSCALE_HOST}`)"
+      - "traefik.http.routers.bazarr.entrypoints=bazarr"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.routers.bazarr.middlewares=authelia@docker"
       - "traefik.http.services.bazarr.loadbalancer.server.port=6767"

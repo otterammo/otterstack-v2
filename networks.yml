@@ -1,0 +1,69 @@
+networks:
+  # DMZ - External-facing ingress layer
+  # Services: Traefik, Cloudflared
+  dmz-net:
+    name: dmz-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
+
+  # Frontend - User-facing application services
+  # Services: Jellyfin, Jellyseerr, Web UI, Grafana
+  frontend-net:
+    name: frontend-net
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.1.0/24
+          gateway: 172.20.1.1
+
+  # Backend - Business logic and automation services
+  # Services: Sonarr, Radarr, Prowlarr, Bazarr, Jellyseerr (API access)
+  backend-net:
+    name: backend-net
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.2.0/24
+          gateway: 172.20.2.1
+
+  # Download - VPN-routed download services
+  # Services: Gluetun, qBittorrent (via Gluetun), Sonarr, Radarr, Prowlarr
+  download-net:
+    name: download-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.3.0/24
+          gateway: 172.20.3.1
+
+  # Management - Infrastructure and monitoring services
+  # Services: Prometheus, Grafana, cAdvisor, Node Exporter, Alertmanager, Dozzle, Autoheal
+  mgmt-net:
+    name: mgmt-net
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.4.0/24
+          gateway: 172.20.4.1
+
+  # Security - Security and authentication services (future: Authelia, fail2ban)
+  # Note: fail2ban currently uses host network, will be migrated in later iteration
+  security-net:
+    name: security-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.5.0/24
+          gateway: 172.20.5.1

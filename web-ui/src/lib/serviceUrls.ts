@@ -12,14 +12,12 @@ export function getServiceDisplayUrl(
 ): string {
   const { preferLocalUrl = false } = options
 
-  if (!preferLocalUrl) {
-    // Public services always use otterammo.xyz subdomains
-    if (service.id === 'jellyfin') {
-      return 'https://jellyfin.otterammo.xyz'
-    }
-    if (service.id === 'jellyseerr') {
-      return 'https://jellyseerr.otterammo.xyz'
-    }
+  if (preferLocalUrl && service.localUrl) {
+    return service.localUrl
+  }
+
+  if (!preferLocalUrl && service.publicUrl) {
+    return service.publicUrl
   }
   
   // All other services use their displayUrl (IP:PORT)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetch } from 'undici'
 import { SERVICES } from '@/lib/services'
 
-const TIMEOUT_MS = 5000
+const TIMEOUT_MS = 60000
 
 export async function GET(
   request: NextRequest,

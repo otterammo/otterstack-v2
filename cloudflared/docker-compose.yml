@@ -3,14 +3,31 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
+    user: root  # Required to read Docker secrets
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+      - TUNNEL_TOKEN_FILE=/run/secrets/cloudflare_token
+    secrets:
+      - cloudflare_token
+    command: tunnel --no-autoupdate run
     networks:
-      - media-network
+      - dmz-net           # DMZ network with Traefik
     depends_on:
       - traefik
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+    healthcheck:
+      test: ["CMD", "cloudflared", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     labels:
+      - "autoheal=true"
       - "traefik.enable=false"  # Cloudflared doesn't need to be exposed through Traefik

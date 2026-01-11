@@ -1,16 +1,24 @@
 include:
-  - traefik/docker-compose.yml
+  - authelia/docker-compose.yml
+  - backup/docker-compose.yml
+  - cloudflared/docker-compose.yml
+  - dozzle/docker-compose.yml
   - fail2ban/docker-compose.yml
-  - web-ui/docker-compose.yml
   - jellyfin/docker-compose.yml
   - jellyseerr/docker-compose.yml
-  - servarr/docker-compose.yml
-  - qbittorrent/docker-compose.yml
-  - cloudflared/docker-compose.yml
   - monitoring/docker-compose.yml
-  - dozzle/docker-compose.yml
+  - qbittorrent/docker-compose.yml
+  - servarr/docker-compose.yml
+  - traefik/docker-compose.yml
+  - web-ui/docker-compose.yml
+  - networks.yml
 
-networks:
-  media-network:
-    name: ${NETWORK_NAME:-media-network}
-    driver: bridge
+secrets:
+  cloudflare_token:
+    file: ./secrets/cloudflare_token
+  grafana_admin_password:
+    file: ./secrets/grafana_admin_password
+  webui_admin_password:
+    file: ./secrets/webui_admin_password
+  wireguard_private_key:
+    file: ./secrets/wireguard_private_key

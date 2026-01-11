@@ -1,117 +1,47 @@
-# Fail2ban - Intrusion Prevention
+# Fail2ban
 
-Automatically bans malicious IPs by monitoring Traefik access logs.
+Intrusion prevention that bans malicious IPs based on Traefik access logs.
 
-## Protection Rules
+See `DETAILS.md` for rules, tuning, and alerting setup.
 
-### traefik-auth
-- **Trigger**: 5 failed auth attempts (401/403) in 10 minutes
-- **Ban**: 1 hour
-
-### traefik-botsearch
-- **Trigger**: 3 bot/scanner requests (.php, wp-admin, etc.) in 10 minutes  
-- **Ban**: 24 hours
-
-## Common Commands
-
-### Check Status
-```bash
-# View all jails
-docker exec fail2ban fail2ban-client status
-
-# View banned IPs
-docker exec fail2ban fail2ban-client status traefik-auth
-docker exec fail2ban fail2ban-client status traefik-botsearch
-```
-
-### Manage Bans
-```bash
-# Unban an IP
-docker exec fail2ban fail2ban-client set traefik-auth unbanip <IP>
-
-# Unban all
-docker exec fail2ban fail2ban-client unban --all
-```
-
-### View Logs
-```bash
-# Live logs
-docker logs -f fail2ban
-
-# Last 50 lines
-docker logs --tail 50 fail2ban
-```
+## Access
+- No UI; manage via `fail2ban-client` in the container.
 
 ## Configuration
+- Jails: `fail2ban/config/jail.d/traefik.conf`
+- Filters: `fail2ban/config/filter.d/`
+- Database: `fail2ban/config/db/fail2ban.sqlite3`
+- Traefik logs mounted at `/traefik-logs`
+- Default rules:
+  - `traefik-auth`: 5 failed 401/403 attempts in 10m, ban 1h
+  - `traefik-botsearch`: 3 bot/scanner requests in 10m, ban 24h
+- Whitelist example: `fail2ban/config/jail.d/00-whitelist.conf`
 
-### Adjust Ban Rules
+## Environment
+- `TZ`
+- `F2B_LOG_LEVEL`, `F2B_DB_PURGE_AGE`, `F2B_MAX_RETRY`
+- Email alerts: `FAIL2BAN_EMAIL`, `FAIL2BAN_SENDER`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_TLS`
+- Action: `F2B_ACTION` (set to `%(action_mw)s` to enable email with whois)
 
-Edit `config/jail.d/traefik.conf`:
-```ini
-[traefik-auth]
-maxretry = 5    # Attempts before ban
-bantime = 1h    # Ban duration (1h, 24h, 7d, etc.)
-findtime = 10m  # Time window for counting attempts
-```
-
-### Whitelist IPs
-
-Create `config/jail.d/00-whitelist.conf`:
-```ini
-[DEFAULT]
-ignoreip = 127.0.0.1/8 ::1 192.168.1.0/24 your-trusted-ip
-```
-
-### Email Notifications (Optional)
-
-Add to `.env`:
+## Start/stop
 ```bash
-FAIL2BAN_EMAIL=your-email@example.com
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-username
-SMTP_PASSWORD=your-password
-```
-
-Update `docker-compose.yml`:
-```yaml
-- F2B_ACTION=%(action_mw)s  # Sends email with whois
-```
-
-Restart:
-```bash
-docker compose restart fail2ban
+docker compose up -d
+docker compose logs -f fail2ban
 ```
 
 ## Troubleshooting
+- Status: `docker exec fail2ban fail2ban-client status`
+- Banned IPs: `docker exec fail2ban fail2ban-client status traefik-auth`
+- Unban an IP: `docker exec fail2ban fail2ban-client set traefik-auth unbanip <IP>`
+- Verify Traefik logs exist: `ls -la traefik/logs/access.log`
+- Check Fail2ban can read logs: `docker exec fail2ban ls -la /traefik-logs/`
+- Test filters manually:
+  ```bash
+  docker exec fail2ban fail2ban-regex /traefik-logs/access.log /data/filter.d/traefik-auth.conf
+  ```
+- Check iptables rules: `sudo iptables -L f2b-traefik-auth -v -n`
+- Reload jails: `docker exec fail2ban fail2ban-client reload`
 
-### No IPs being banned
-
-1. **Check Traefik logs exist:**
-   ```bash
-   ls -la traefik/logs/access.log
-   ```
-
-2. **Verify Fail2ban can read logs:**
-   ```bash
-   docker exec fail2ban ls -la /traefik-logs/
-   ```
-
-3. **Test filter manually:**
-   ```bash
-   docker exec fail2ban fail2ban-regex /traefik-logs/access.log /data/filter.d/traefik-auth.conf
-   ```
-
-4. **Check iptables rules:**
-   ```bash
-   sudo iptables -L f2b-traefik-auth -v -n
-   ```
-
-### Reload Configuration
-```bash
-# Reload all jails
-docker exec fail2ban fail2ban-client reload
-
-# Reload specific jail
-docker exec fail2ban fail2ban-client reload traefik-auth
-```
+## Security
+- Runs in host network mode to manage iptables.
+- Review whitelists to avoid banning trusted IPs.

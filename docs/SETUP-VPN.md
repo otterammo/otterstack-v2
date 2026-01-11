@@ -39,23 +39,29 @@ Port forwarding improves seeding performance by allowing incoming connections:
 2. Request a port (you'll receive a random port number, e.g., 51820)
 3. Note this port number for configuration
 
-## Step 3: Configure Environment Variables
+## Step 3: Configure WireGuard Secrets and Environment Variables
 
-1. Open your `.env` file (or create it from `.env.template`):
+1. Open your `.env` file (or create it from `.env.example`):
    ```bash
    cd /home/otterammo/media
-   cp .env.template .env
+   cp .env.example .env
    nano .env
    ```
 
-2. Add/update these VPN-related variables:
+2. Save the WireGuard private key as a Docker secret:
+   ```bash
+   # Replace with the PrivateKey from the Mullvad config (single line)
+   printf '%s' 'abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx=' > secrets/wireguard_private_key
+   chmod 600 secrets/wireguard_private_key
+   ```
+
+3. Add/update these VPN-related variables:
    ```bash
    # VPN Configuration
    VPN_PROVIDER=mullvad
    VPN_TYPE=wireguard
    
-   # Paste your credentials from Step 1
-   WIREGUARD_PRIVATE_KEY='abcd1234efgh5678ijkl9012mnop3456qrst7890uvwx='
+   # Paste your address from Step 1
    WIREGUARD_ADDRESSES=10.67.123.45/32
    
    # Choose a server city close to you
@@ -66,10 +72,10 @@ Port forwarding improves seeding performance by allowing incoming connections:
    VPN_INPUT_PORTS=6881
    
    # Update these subnets if your network differs
-   FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
+   FIREWALL_OUTBOUND_SUBNETS=172.20.0.0/16,192.168.1.0/24
    ```
 
-3. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
+4. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
    ```bash
    cd /home/otterammo/media
    docker compose up -d gluetun
@@ -77,18 +83,15 @@ Port forwarding improves seeding performance by allowing incoming connections:
 
 ## Step 4: Verify Docker Network Subnet
 
-The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnet:
+The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnets. Verify the download network:
 
 ```bash
-docker network inspect media-network | grep Subnet
+docker network inspect download-net | grep Subnet
 ```
 
-You should see something like:
-```
-"Subnet": "172.18.0.0/16"
-```
+You should see the configured subnet (e.g., `172.20.3.0/24`).
 
-If the subnet is different, update `FIREWALL_OUTBOUND_SUBNETS` in your `.env` file.
+If the subnets are different, update `FIREWALL_OUTBOUND_SUBNETS` in your `.env` file.
 
 ## Step 5: Start Gluetun and qBittorrent
 
@@ -120,6 +123,12 @@ INFO [ip getter] Public IP address is x.x.x.x (Mullvad)
 INFO [vpn] Connected!
 ```
 
+### Confirm Secret Mount
+
+```bash
+docker exec gluetun ls -l /run/secrets
+```
+
 ### Verify IP Address
 
 Check what IP address qBittorrent sees:
@@ -140,15 +149,11 @@ Should show Mullvad DNS servers (typically 10.64.0.1).
 
 ### Test qBittorrent Access
 
-Visit your qBittorrent WebUI:
+Visit your qBittorrent WebUI via Traefik:
 ```
-http://localhost:8080
+https://<TAILSCALE_HOST>:8080
 ```
-
-or via Traefik domain:
-```
-http://qbittorrent.local
-```
+This route is protected by Authelia.
 
 ## Step 7: Configure qBittorrent Settings
 
@@ -197,7 +202,7 @@ docker logs gluetun
 Common issues:
 - Invalid WireGuard credentials
 - Expired Mullvad account
-- Port conflict on 8080 or 6881
+  - Port conflict on 6881 or the Traefik entrypoint on 8080
 
 ### qBittorrent Not Accessible
 
@@ -222,7 +227,7 @@ Common issues:
 
 2. Verify Docker network subnet is correct:
    ```bash
-   docker network inspect media-network | grep Subnet
+   docker network inspect download-net | grep Subnet
    ```
 
 3. Update `FIREWALL_OUTBOUND_SUBNETS` in `.env` if needed
@@ -292,9 +297,10 @@ The private key displayed in the Mullvad web console is **different** from the a
 2. Download the WireGuard configuration (don't just copy from the web page)
 3. Extract the downloaded archive (`.zip` or `.conf` file)
 4. Open the config file and find the **actual** `PrivateKey` value
-5. Update your `.env` file with this private key:
+5. Update the WireGuard secret with this private key:
    ```bash
-   WIREGUARD_PRIVATE_KEY='<key from config file>'
+   printf '%s' '<key from config file>' > secrets/wireguard_private_key
+   chmod 600 secrets/wireguard_private_key
    ```
 6. Recreate the container:
    ```bash
@@ -311,6 +317,23 @@ The private key displayed in the Mullvad web console is **different** from the a
 - Mullvad account expired (check time remaining)
 - WireGuard key not activated (wait 60 seconds after generation)
 - Payment issue or account suspended
+
+## Auto-Healing
+
+The compose stack deploys a small [autoheal](https://hub.docker.com/r/willfarrell/autoheal) helper that watches Gluetun's Docker healthcheck. When Gluetun reports itself as `unhealthy`, autoheal issues a `docker restart gluetun`, which also bounces qBittorrent because it shares Gluetun's network namespace.
+
+Useful commands:
+
+```bash
+# Check autoheal status/logs
+docker ps | grep autoheal
+docker logs autoheal --tail=20
+
+# Confirm Gluetun health flag
+docker inspect --format '{{.State.Health.Status}}' gluetun
+```
+
+If you ever need to disable auto-healing, remove the `autoheal` service and the `autoheal=true` label from Gluetun in `qbittorrent/docker-compose.yml`.
 
 ## Rolling Back
 

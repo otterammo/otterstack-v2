@@ -1,6 +1,13 @@
 import { Service } from '@/types/service'
 
 const serverIP = process.env.SERVER_IP || '127.0.0.1'
+const tailscaleHost = process.env.TAILSCALE_HOST
+const localAccessScheme = tailscaleHost ? 'https' : 'http'
+const localAccessHost = tailscaleHost || serverIP
+const localUrlForPort = (port: number) =>
+  `${localAccessScheme}://${localAccessHost}:${port}`
+const publicJellyfinDomain = process.env.PUBLIC_JELLYFIN_DOMAIN || 'jellyfin.otterammo.xyz'
+const publicJellyseerrDomain = process.env.PUBLIC_JELLYSEERR_DOMAIN || 'jellyseerr.otterammo.xyz'
 
 export const SERVICES: Service[] = [
   // Public Services
@@ -10,6 +17,8 @@ export const SERVICES: Service[] = [
     description: 'Stream your media library',
     url: `http://jellyfin:8096`,
     displayUrl: `http://${serverIP}:8096`,
+    localUrl: localUrlForPort(8096),
+    publicUrl: `https://${publicJellyfinDomain}`,
     category: 'public',
     healthEndpoint: '/health',
   },
@@ -19,8 +28,10 @@ export const SERVICES: Service[] = [
     description: 'Request movies and TV shows',
     url: `http://jellyseerr:5055`,
     displayUrl: `http://${serverIP}:5055`,
+    localUrl: localUrlForPort(5055),
+    publicUrl: `https://${publicJellyseerrDomain}`,
     category: 'public',
-    healthEndpoint: '/api/v1/status',
+    healthEndpoint: '/api/v1/status/appdata',
   },
   
   // Media Management
@@ -30,6 +41,7 @@ export const SERVICES: Service[] = [
     description: 'TV show management',
     url: `http://sonarr:8989`,
     displayUrl: `http://${serverIP}:8989`,
+    localUrl: localUrlForPort(8989),
     category: 'media',
     healthEndpoint: '/ping',
   },
@@ -39,6 +51,7 @@ export const SERVICES: Service[] = [
     description: 'Movie management',
     url: `http://radarr:7878`,
     displayUrl: `http://${serverIP}:7878`,
+    localUrl: localUrlForPort(7878),
     category: 'media',
     healthEndpoint: '/ping',
   },
@@ -48,6 +61,7 @@ export const SERVICES: Service[] = [
     description: 'Indexer management',
     url: `http://prowlarr:9696`,
     displayUrl: `http://${serverIP}:9696`,
+    localUrl: localUrlForPort(9696),
     category: 'media',
     healthEndpoint: '/ping',
   },
@@ -57,6 +71,7 @@ export const SERVICES: Service[] = [
     description: 'Subtitle management',
     url: `http://bazarr:6767`,
     displayUrl: `http://${serverIP}:6767`,
+    localUrl: localUrlForPort(6767),
     category: 'media',
     healthEndpoint: '/ping',
   },
@@ -68,6 +83,7 @@ export const SERVICES: Service[] = [
     description: 'Torrent client',
     url: `http://gluetun:8080`,
     displayUrl: `http://${serverIP}:8080`,
+    localUrl: localUrlForPort(8080),
     category: 'download',
     healthEndpoint: '/',
   },
@@ -77,8 +93,9 @@ export const SERVICES: Service[] = [
     id: 'traefik',
     name: 'Traefik',
     description: 'Reverse proxy',
-    url: `http://traefik:8080`,
-    displayUrl: `http://${serverIP}:8090`,
+    url: `http://traefik:80`,
+    displayUrl: `http://${serverIP}:8085`,
+    localUrl: localUrlForPort(8085),
     category: 'infrastructure',
     healthEndpoint: '/ping',
   },
@@ -88,6 +105,7 @@ export const SERVICES: Service[] = [
     description: 'Container logs',
     url: `http://dozzle:8080`,
     displayUrl: `http://${serverIP}:9999`,
+    localUrl: localUrlForPort(8082),
     category: 'infrastructure',
     healthEndpoint: '/healthcheck',
   },
@@ -99,6 +117,7 @@ export const SERVICES: Service[] = [
     description: 'Metrics dashboard',
     url: `http://grafana:3000`,
     displayUrl: `http://${serverIP}:3001`,
+    localUrl: localUrlForPort(3000),
     category: 'monitoring',
     healthEndpoint: '/api/health',
   },
@@ -108,6 +127,7 @@ export const SERVICES: Service[] = [
     description: 'Metrics collection',
     url: `http://prometheus:9090`,
     displayUrl: `http://${serverIP}:9090`,
+    localUrl: localUrlForPort(9090),
     category: 'monitoring',
     healthEndpoint: '/-/healthy',
   },
@@ -117,8 +137,19 @@ export const SERVICES: Service[] = [
     description: 'Container metrics',
     url: `http://cadvisor:8080`,
     displayUrl: `http://${serverIP}:8081`,
+    localUrl: localUrlForPort(8081),
     category: 'monitoring',
     healthEndpoint: '/healthz',
+  },
+  {
+    id: 'alertmanager',
+    name: 'Alertmanager',
+    description: 'Alert routing and notifications',
+    url: `http://alertmanager:9093`,
+    displayUrl: `http://${serverIP}:9093`,
+    localUrl: localUrlForPort(9093),
+    category: 'monitoring',
+    healthEndpoint: '/',
   },
 ]
 
