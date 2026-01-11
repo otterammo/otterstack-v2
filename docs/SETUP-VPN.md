@@ -41,10 +41,10 @@ Port forwarding improves seeding performance by allowing incoming connections:
 
 ## Step 3: Configure WireGuard Secrets and Environment Variables
 
-1. Open your `.env` file (or create it from `.env.template`):
+1. Open your `.env` file (or create it from `.env.example`):
    ```bash
    cd /home/otterammo/media
-   cp .env.template .env
+   cp .env.example .env
    nano .env
    ```
 
@@ -72,7 +72,7 @@ Port forwarding improves seeding performance by allowing incoming connections:
    VPN_INPUT_PORTS=6881
    
    # Update these subnets if your network differs
-   FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
+   FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,172.20.0.0/16,192.168.1.0/24
    ```
 
 4. Save and close the file, then redeploy the stack so Gluetun picks up the new environment:
@@ -83,10 +83,10 @@ Port forwarding improves seeding performance by allowing incoming connections:
 
 ## Step 4: Verify Docker Network Subnet
 
-The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnet:
+The `FIREWALL_OUTBOUND_SUBNETS` must include your Docker network subnets:
 
 ```bash
-docker network inspect media-network | grep Subnet
+docker network inspect media-network download-net | grep Subnet
 ```
 
 You should see something like:
@@ -94,7 +94,7 @@ You should see something like:
 "Subnet": "172.18.0.0/16"
 ```
 
-If the subnet is different, update `FIREWALL_OUTBOUND_SUBNETS` in your `.env` file.
+If the subnets are different, update `FIREWALL_OUTBOUND_SUBNETS` in your `.env` file.
 
 ## Step 5: Start Gluetun and qBittorrent
 
@@ -152,15 +152,11 @@ Should show Mullvad DNS servers (typically 10.64.0.1).
 
 ### Test qBittorrent Access
 
-Visit your qBittorrent WebUI:
+Visit your qBittorrent WebUI via Traefik:
 ```
-http://localhost:8080
+https://<TAILSCALE_HOST>:8080
 ```
-
-or via Traefik domain:
-```
-http://qbittorrent.lan
-```
+This route is protected by Authelia.
 
 ## Step 7: Configure qBittorrent Settings
 
@@ -209,7 +205,7 @@ docker logs gluetun
 Common issues:
 - Invalid WireGuard credentials
 - Expired Mullvad account
-- Port conflict on 8080 or 6881
+  - Port conflict on 6881 or the Traefik entrypoint on 8080
 
 ### qBittorrent Not Accessible
 
@@ -234,7 +230,7 @@ Common issues:
 
 2. Verify Docker network subnet is correct:
    ```bash
-   docker network inspect media-network | grep Subnet
+   docker network inspect media-network download-net | grep Subnet
    ```
 
 3. Update `FIREWALL_OUTBOUND_SUBNETS` in `.env` if needed

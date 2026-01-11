@@ -8,6 +8,8 @@ This monitoring setup provides observability for the media stack using Prometheu
 - **Grafana** - Dashboards and visualization
 - **cAdvisor** - Container metrics
 - **Node Exporter** - System metrics
+- **Loki** - Log storage
+- **Promtail** - Log shipping
 
 ## Quick Start
 
@@ -17,11 +19,14 @@ This monitoring setup provides observability for the media stack using Prometheu
    ```
 
 2. **Access Grafana:**
-   - URL: http://grafana.lan
-   - Default credentials: admin/admin (change on first login)
+   - URL: https://<TAILSCALE_HOST>:3000
+   - Credentials: `admin` and the password stored in `secrets/grafana_admin_password`
 
 3. **Access Prometheus:**
-   - URL: http://prometheus.lan
+   - URL: https://<TAILSCALE_HOST>:9090
+
+4. **Access Alertmanager:**
+   - URL: https://<TAILSCALE_HOST>:9093
 
 ## Configuration
 
@@ -55,10 +60,7 @@ The following alerts are configured:
 
 ## Mobile Access
 
-All services are accessible via your Cloudflared tunnel:
-- Grafana provides mobile-responsive dashboards
-- Prometheus offers a mobile-friendly query interface
-- cAdvisor shows real-time container metrics
+Monitoring services are exposed on Traefik entrypoints and are intended for access over Tailscale. Cloudflared is not configured to expose monitoring endpoints by default.
 
 ## Customization
 
@@ -110,8 +112,8 @@ docker compose exec grafana grafana-cli admin reset-admin-password admin
 
 ## Security
 
-- Change default Grafana password on first login
-- Consider enabling authentication for Prometheus in production
+- Grafana, Prometheus, and Alertmanager are protected by Authelia on Traefik entrypoints
+- Store the Grafana admin password in `secrets/grafana_admin_password`
 - Review firewall rules for external access
 - Use strong passwords for tunnel access
 

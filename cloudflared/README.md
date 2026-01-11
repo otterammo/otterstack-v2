@@ -21,26 +21,26 @@ This directory contains the Docker Compose configuration for Cloudflare Tunnel (
 
 ### 2. Configure Environment Variables
 
-1. Copy `.env.template` to `.env` in the media directory:
+1. Copy `.env.example` to `.env` in the media directory:
    ```bash
-   cp .env.template .env
+   cp .env.example .env
    ```
 
-2. Edit the `.env` file and add your tunnel token:
+2. Save your tunnel token as a Docker secret:
    ```bash
-   CLOUDFLARE_TUNNEL_TOKEN=your_actual_tunnel_token_here
+   printf '%s' 'your_actual_tunnel_token_here' > secrets/cloudflare_token
+   chmod 600 secrets/cloudflare_token
    ```
 
 ### 3. Configure Tunnel Routes
 
-In the Cloudflare Zero Trust dashboard, configure routes for your services:
+In the Cloudflare Zero Trust dashboard, configure routes for your public services (admin services are accessed via Tailscale): 
 
-- **jellyfin.yourdomain.com** → `http://traefik:80` (with Host header: `jellyfin.lan`)
-- **jellyseerr.yourdomain.com** → `http://traefik:80` (with Host header: `jellyseerr.lan`)
-- **sonarr.yourdomain.com** → `http://traefik:80` (with Host header: `sonarr.lan`)
-- **radarr.yourdomain.com** → `http://traefik:80` (with Host header: `radarr.lan`)
-- **prowlarr.yourdomain.com** → `http://traefik:80` (with Host header: `prowlarr.lan`)
-- **qbittorrent.yourdomain.com** → `http://traefik:80` (with Host header: `qbittorrent.lan`)
+- **jellyfin.yourdomain.com** → `http://traefik:80` (Host header: `jellyfin.yourdomain.com`)
+- **jellyseerr.yourdomain.com** → `http://traefik:80` (Host header: `jellyseerr.yourdomain.com`)
+- **dashboard.yourdomain.com** → `http://traefik:80` (Host header: `dashboard.yourdomain.com`)
+
+These hostnames should match `PUBLIC_JELLYFIN_DOMAIN`, `PUBLIC_JELLYSEERR_DOMAIN`, and `PUBLIC_DASHBOARD_DOMAIN` in `.env`.
 
 ### 4. Start the Services
 

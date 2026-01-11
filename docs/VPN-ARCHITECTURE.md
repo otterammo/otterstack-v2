@@ -29,9 +29,9 @@ graph TD
   B["Mullvad VPN Network<br/>WireGuard Tunnel<br/>Encrypted & Anonymized"]
   
   C["Host Machine - Linux"]
-  D["Docker Network: media-network"]
+  D["Docker Networks: media-network + segmented nets"]
   
-  E["Traefik<br/>Reverse Proxy<br/>Ports: 80, 443"]
+  E["Traefik<br/>Reverse Proxy<br/>Port 80 + entrypoints"]
   F["Gluetun VPN Container<br/>WireGuard Client<br/>Killswitch Firewall<br/>DNS Leak Protection"]
   G["qBittorrent Container<br/>network_mode: service:gluetun<br/>Port 8080 WebUI<br/>Port 6881 Peers"]
   
@@ -422,10 +422,10 @@ Response: {"hash": "abc123...", "status": "downloading"}
 
 | Port | Protocol | Container | Purpose | Exposed To |
 |------|----------|-----------|---------|------------|
-| 8080 | TCP | Gluetun | qBittorrent WebUI | Host + LAN |
+| 8080 | TCP | Traefik entrypoint -> Gluetun | qBittorrent WebUI | Tailscale (Authelia) |
 | VPN_INPUT_PORTS (default 6881) | TCP | Gluetun | Torrent incoming | Internet (VPN) |
 | VPN_INPUT_PORTS (default 6881) | UDP | Gluetun | Torrent incoming | Internet (VPN) |
-| 8888 | TCP | Gluetun | HTTP proxy | Optional |
+| 8888 | TCP | Gluetun | HTTP proxy | Optional (disabled by default) |
 | 8388 | TCP | Gluetun | Shadowsocks | Disabled |
 
 ### Port Forwarding Architecture
@@ -461,11 +461,11 @@ graph TD
 ### Traefik Routing
 
 ```
-Browser Request: https://qbittorrent.yourdomain.com
+Browser Request: https://<TAILSCALE_HOST>:8080
         ↓
 ┌──────────────────────────────────────────────────────────┐
 │  Traefik Router (examines labels on Gluetun)             │
-│  Rule: Host(`qbittorrent.yourdomain.com`)                │
+│  Rule: Host(`<TAILSCALE_HOST>`)                          │
 └──────────────────────────────────────────────────────────┘
         ↓
 ┌──────────────────────────────────────────────────────────┐
@@ -564,7 +564,7 @@ Result: Only VPN traffic allowed, everything else blocked
 
 The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to bypass the VPN killswitch. This setting enables:
 
-- Containers on the media-network to reach Gluetun:8080
+- Containers on `media-network` and `download-net` to reach Gluetun:8080
 - Traefik to proxy requests to qBittorrent WebUI
 - Sonarr/Radarr API communication with Gluetun
 - Local subnet access for management and monitoring
@@ -574,12 +574,12 @@ The `FIREWALL_OUTBOUND_SUBNETS` configuration allows specific network traffic to
 **Configuration Example**:
 
 ```
-FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,192.168.1.0/24
+FIREWALL_OUTBOUND_SUBNETS=172.18.0.0/16,172.20.0.0/16,192.168.1.0/24
 ```
 
 #### WebUI Access
 
-Port 8080 is published directly on the Gluetun container (`ports: "8080:8080"`), so local administrators, health checks, and Traefik can reach the qBittorrent UI without any additional firewall overrides.
+Traefik exposes an entrypoint on port 8080 and routes it to `gluetun:8080`. The Gluetun container does not publish 8080 directly on the host.
 
 ---
 
@@ -743,7 +743,7 @@ Diagnosis:
 Resolution:
 ┌───────────────────────────────────────────────────────────┐
 │ 1. Identify Docker network subnet:                        │
-│    docker network inspect media-network                   │
+│    docker network inspect media-network download-net      │
 │    Look for "Subnet": "172.18.0.0/16"                     │
 │                                                           │
 │ 2. Update FIREWALL_OUTBOUND_SUBNETS:                      │
@@ -798,9 +798,9 @@ docker exec gluetun cat /etc/resolv.conf
 docker exec gluetun iptables -L -v -n
 # Review DROP rules for non-VPN traffic
 
-# Test qBittorrent accessibility
-curl -I http://localhost:8080
-# Should return 200 OK
+# Test qBittorrent accessibility (Authelia protected)
+curl -k -I https://<TAILSCALE_HOST>:8080
+# Should return 302 or 401/403 if Authelia is active
 
 # Monitor VPN logs
 docker logs -f gluetun
