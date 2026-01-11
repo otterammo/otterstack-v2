@@ -4,12 +4,11 @@ services:
     container_name: media-web-ui
     restart: unless-stopped
     user: "1000:1000"
-    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:3001
     networks:
-      - frontend-net      # User-facing dashboard
-      - backend-net       # Reach automation services for health checks
-      - download-net      # Reach qBittorrent via Gluetun for health checks
-      - mgmt-net          # Reach monitoring stack for health checks
+      - frontend-net
+      - backend-net
+      - download-net
+      - mgmt-net
     secrets:
       - webui_admin_password
     environment:

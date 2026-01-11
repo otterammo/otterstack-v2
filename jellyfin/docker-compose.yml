@@ -3,7 +3,6 @@ services:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:8096
     # Note: DLNA (1900/udp) and auto-discovery (7359/udp) disabled - configure clients manually
     volumes:
       - ./config:/config
@@ -23,7 +22,7 @@ services:
         reservations:
           memory: 512M
     networks:
-      - frontend-net      # User-facing service
+      - frontend-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8096/health"]
       interval: 30s

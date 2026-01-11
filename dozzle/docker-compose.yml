@@ -4,8 +4,7 @@ services:
     container_name: dozzle
     restart: unless-stopped
     networks:
-      - mgmt-net                        # Management layer
-    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:8082
+      - mgmt-net
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:

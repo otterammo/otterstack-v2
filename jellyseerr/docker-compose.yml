@@ -3,7 +3,6 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at https://${TAILSCALE_HOST}:5055
     volumes:
       - ./config:/app/config
     environment:
@@ -17,8 +16,8 @@ services:
         reservations:
           memory: 128M
     networks:
-      - frontend-net      # User interface
-      - backend-net       # API calls to Sonarr/Radarr
+      - frontend-net
+      - backend-net
     depends_on:
       - jellyfin
     healthcheck:

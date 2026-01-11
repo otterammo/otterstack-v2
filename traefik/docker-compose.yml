@@ -67,12 +67,12 @@ services:
       - TZ=${TZ:-UTC}
       - DOCKER_API_VERSION=1.44
     networks:
-      - dmz-net           # External access
-      - frontend-net      # Route to frontend services
-      - backend-net       # Route to backend services (for monitoring)
-      - security-net      # Connect to security services
-      - download-net      # Route to qBittorrent via Gluetun
-      - mgmt-net          # Route to monitoring/admin utilities
+      - dmz-net
+      - frontend-net
+      - backend-net
+      - security-net
+      - download-net
+      - mgmt-net
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping", "--ping.entrypoint=web", "--entrypoints.web.address=:80"]
       interval: 30s

@@ -3,7 +3,6 @@ services:
     image: offen/docker-volume-backup:latest
     container_name: backup
     restart: unless-stopped
-
     volumes:
       # Service configs to backup (read-only)
       - ../jellyfin/config:/backup/jellyfin-config:ro
@@ -19,13 +18,10 @@ services:
       - ../traefik/config:/backup/traefik-config:ro
       - ../authelia/config:/backup/authelia-config:ro
       - ../authelia/data:/backup/authelia-data:ro
-
       # Docker socket for container stop/start during backup
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
       # Backup destination
       - ${BACKUP_DESTINATION:-/mnt/backups}:/archive
-
     environment:
       - TZ=${TZ:-UTC}
       - BACKUP_CRON_EXPRESSION=${BACKUP_CRON:-0 2 * * *}
@@ -33,16 +29,13 @@ services:
       - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
       - BACKUP_PRUNING_LEEWAY=1m
       - BACKUP_COMPRESSION=gz
-
     deploy:
       resources:
         limits:
           memory: 512M
         reservations:
           memory: 128M
-
     networks:
       - mgmt-net
-
     labels:
       - "traefik.enable=false"

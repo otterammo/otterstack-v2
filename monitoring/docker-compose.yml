@@ -4,7 +4,6 @@ services:
     container_name: prometheus
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://prometheus.lan
     volumes:
       - ./prometheus/config:/etc/prometheus
       - ./prometheus/data:/prometheus
@@ -27,10 +26,10 @@ services:
         reservations:
           memory: 128M
     networks:
-      - mgmt-net          # Management layer
-      - frontend-net      # Scrape frontend services
-      - backend-net       # Scrape backend services
-      - download-net      # Scrape download services
+      - mgmt-net
+      - frontend-net
+      - backend-net
+      - download-net
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9090/"]
       interval: 30s
@@ -51,7 +50,6 @@ services:
     container_name: grafana
     restart: unless-stopped
     user: "${PUID:-1000}:${PGID:-1000}"
-    # Removed: ports - Access via Traefik at http://grafana.lan
     volumes:
       - ./grafana/data:/var/lib/grafana
       - ./grafana/config/grafana.ini:/etc/grafana/grafana.ini
@@ -72,8 +70,8 @@ services:
         reservations:
           memory: 64M
     networks:
-      - mgmt-net          # Management layer
-      - frontend-net      # User-facing dashboard
+      - mgmt-net
+      - frontend-net
     depends_on:
       - prometheus
     healthcheck:
@@ -95,7 +93,6 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
-    # Removed: ports - Access via Traefik at http://cadvisor.lan
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
@@ -127,7 +124,7 @@ services:
         reservations:
           memory: 64M
     networks:
-      - mgmt-net          # Management layer
+      - mgmt-net
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cadvisor.rule=Host(`${TAILSCALE_HOST}`)"
@@ -140,7 +137,6 @@ services:
     image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
-    # Removed: ports - Scraped by Prometheus internally via mgmt-net
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -161,7 +157,7 @@ services:
         reservations:
           memory: 32M
     networks:
-      - mgmt-net          # Management layer
+      - mgmt-net
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:9100/"]
       interval: 30s
@@ -176,7 +172,6 @@ services:
     container_name: alertmanager
     restart: unless-stopped
     user: "${PUID:-65534}:${PGID:-65534}"
-    # Removed: ports - Access via Traefik at http://alertmanager.lan
     volumes:
       - ./alertmanager/config:/etc/alertmanager
       - ./alertmanager/data:/alertmanager
@@ -194,7 +189,7 @@ services:
         reservations:
           memory: 32M
     networks:
-      - mgmt-net          # Management layer
+      - mgmt-net
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9093/"]
       interval: 30s
@@ -229,7 +224,7 @@ services:
         reservations:
           memory: 128M
     networks:
-      - mgmt-net          # Management layer - internal access only
+      - mgmt-net
     healthcheck:
       test: ["CMD", "loki", "-config.file=/etc/loki/loki-config.yml", "-verify-config"]
       interval: 30s
@@ -259,7 +254,7 @@ services:
         reservations:
           memory: 64M
     networks:
-      - mgmt-net          # Management layer
+      - mgmt-net
     depends_on:
       - loki
     healthcheck:
