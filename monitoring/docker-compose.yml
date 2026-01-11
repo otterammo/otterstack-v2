@@ -280,5 +280,6 @@ services:
           memory: 32M
     networks:
       - mgmt-net
+      - download-net
     labels:
       - "traefik.enable=false"
