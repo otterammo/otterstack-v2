@@ -10,7 +10,6 @@ services:
       # File provider for TLS config
       - "--providers.file.directory=/config"
       - "--providers.file.watch=true"
-
       # Entry points
       - "--entrypoints.web.address=:80"
       - "--entrypoints.jellyfin.address=:8096"
@@ -28,15 +27,15 @@ services:
       - "--entrypoints.dozzle.address=:8082"
       - "--entrypoints.traefik.address=:8085"
       - "--entrypoints.authelia.address=:9091"
-
       # API and dashboard
       - "--api.dashboard=true"
       - "--api.insecure=false"
-      
       # Health check endpoint
       - "--ping=true"
       - "--ping.entrypoint=web"
-      
+      # Metrics
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.entryPoint=prometheus"
       # Logs
       - "--log.level=INFO"
       - "--accesslog=true"
