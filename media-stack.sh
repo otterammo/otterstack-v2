@@ -54,8 +54,12 @@ case "$1" in
         echo "Inspecting media network..."
         docker network inspect media_media-network
         ;;
+    test)
+        echo "Running smoke tests..."
+        ./test-stack.sh "$@"
+        ;;
     *)
-        echo "Usage: $0 {start|stop|restart|status|logs [service]|network-create|network-remove|network-inspect}"
+        echo "Usage: $0 {start|stop|restart|status|logs [service]|network-create|network-remove|network-inspect|test}"
         echo ""
         echo "Services available:"
         services=$(get_services)
@@ -71,6 +75,7 @@ case "$1" in
         echo "  $0 start          # Start all services"
         echo "  $0 logs jellyfin  # Show logs for jellyfin"
         echo "  $0 status         # Show status of all services"
+        echo "  $0 test           # Run smoke tests"
         exit 1
         ;;
 esac
