@@ -20,8 +20,9 @@ fi
 echo ""
 echo "Checking secrets exist..."
 required_secrets=(
-    "secrets/cloudflare_token.txt"
-    "secrets/admin_password.txt"
+    "secrets/cloudflare_token"
+    "secrets/grafana_admin_password"
+    "secrets/webui_admin_password"
     "secrets/wireguard_private_key"
 )
 

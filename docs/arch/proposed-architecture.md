@@ -417,7 +417,7 @@ Layer 5: Application (service-level security)
 ```yaml
 secrets:
   cloudflare_token:
-    file: ./secrets/cloudflare_token.txt
+    file: ./secrets/cloudflare_token
   vpn_private_key:
     file: ./secrets/vpn_private_key.txt
   authelia_jwt:

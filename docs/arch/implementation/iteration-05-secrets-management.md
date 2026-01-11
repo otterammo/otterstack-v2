@@ -72,7 +72,7 @@ We'll use file-based secrets (simpler, no Swarm required):
 ```yaml
 secrets:
   cloudflare_token:
-    file: ./secrets/cloudflare_token.txt
+    file: ./secrets/cloudflare_token
   vpn_private_key:
     file: ./secrets/vpn_private_key.txt
 ```
@@ -84,13 +84,13 @@ secrets:
 ```
 /home/otterammo/media/
 ├── secrets/
-│   ├── cloudflare_token.txt
+│   ├── cloudflare_token
 │   ├── vpn_private_key.txt
 │   ├── vpn_addresses.txt
 │   ├── grafana_password.txt
 │   ├── smtp_password.txt
 │   ├── acme_email.txt
-│   ├── admin_password.txt
+│   ├── webui_admin_password
 │   └── README.md
 ├── .env (minimal, non-sensitive only)
 ├── .env.example (template for users)
@@ -116,13 +116,13 @@ chmod 700 secrets
 cp .env backups/.env.iter5-pre
 
 # Extract each secret to a file
-grep CLOUDFLARE_TUNNEL_TOKEN .env | cut -d'=' -f2- > secrets/cloudflare_token.txt
+grep CLOUDFLARE_TUNNEL_TOKEN .env | cut -d'=' -f2- > secrets/cloudflare_token
 grep WIREGUARD_PRIVATE_KEY .env | cut -d'=' -f2- > secrets/vpn_private_key.txt
 grep WIREGUARD_ADDRESSES .env | cut -d'=' -f2- > secrets/vpn_addresses.txt
 grep GRAFANA_PASSWORD .env | cut -d'=' -f2- > secrets/grafana_password.txt
 grep SMTP_PASSWORD .env | cut -d'=' -f2- > secrets/smtp_password.txt
 grep ACME_EMAIL .env | cut -d'=' -f2- > secrets/acme_email.txt
-grep ADMIN_PASSWORD .env | cut -d'=' -f2- > secrets/admin_password.txt
+grep ADMIN_PASSWORD .env | cut -d'=' -f2- > secrets/webui_admin_password
 
 # Set secure permissions
 chmod 600 secrets/*.txt
@@ -154,7 +154,7 @@ include:
 # Add secrets section
 secrets:
   cloudflare_token:
-    file: ./secrets/cloudflare_token.txt
+    file: ./secrets/cloudflare_token
   vpn_private_key:
     file: ./secrets/vpn_private_key.txt
   vpn_addresses:
@@ -166,7 +166,7 @@ secrets:
   acme_email:
     file: ./secrets/acme_email.txt
   admin_password:
-    file: ./secrets/admin_password.txt
+    file: ./secrets/webui_admin_password
 
 networks:
   # ... existing networks
@@ -453,13 +453,13 @@ FAIL2BAN_EMAIL=admin@your-domain.com
 FAIL2BAN_SENDER=fail2ban@your-domain.com
 
 # SECRETS (create these files in secrets/ directory):
-# secrets/cloudflare_token.txt
+# secrets/cloudflare_token
 # secrets/vpn_private_key.txt
 # secrets/vpn_addresses.txt
 # secrets/grafana_password.txt
 # secrets/smtp_password.txt
 # secrets/acme_email.txt
-# secrets/admin_password.txt
+# secrets/webui_admin_password
 ```
 
 ---
@@ -489,13 +489,13 @@ This directory contains sensitive credentials used by various services.
 
 ## Files
 
-- `cloudflare_token.txt` - Cloudflare Tunnel token
+- `cloudflare_token` - Cloudflare Tunnel token
 - `vpn_private_key.txt` - WireGuard VPN private key
 - `vpn_addresses.txt` - WireGuard VPN addresses
 - `grafana_password.txt` - Grafana admin password
 - `smtp_password.txt` - SMTP password for email notifications
 - `acme_email.txt` - Email for Let's Encrypt registration
-- `admin_password.txt` - Web UI admin password
+- `webui_admin_password` - Web UI admin password
 
 ## Security
 
@@ -547,7 +547,7 @@ chmod 700 secrets
 
 # Verify
 ls -lah secrets/
-cat secrets/cloudflare_token.txt  # Check content
+cat secrets/cloudflare_token  # Check content
 ```
 
 ### Step 3: Update Service Configs

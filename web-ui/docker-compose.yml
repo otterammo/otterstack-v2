@@ -9,13 +9,13 @@ services:
       - media-network      # Keep for backward compatibility (Iteration 1)
       - frontend-net      # User-facing dashboard
     secrets:
-      - admin_password
+      - webui_admin_password
     environment:
       - TZ=${TZ:-UTC}
       - PUBLIC_DASHBOARD_DOMAIN=${PUBLIC_DASHBOARD_DOMAIN:-otterammo.xyz}
       - TAILSCALE_HOST=${TAILSCALE_HOST}
       - SERVER_IP=${SERVER_IP:-192.168.86.111}
-      - ADMIN_PASSWORD_FILE=/run/secrets/admin_password
+      - ADMIN_PASSWORD_FILE=/run/secrets/webui_admin_password
     deploy:
       resources:
         limits:

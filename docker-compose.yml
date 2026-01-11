@@ -16,8 +16,10 @@ include:
 # Iteration 5: File-based secrets
 secrets:
   cloudflare_token:
-    file: ./secrets/cloudflare_token.txt
-  admin_password:
-    file: ./secrets/admin_password.txt
+    file: ./secrets/cloudflare_token
+  grafana_admin_password:
+    file: ./secrets/grafana_admin_password
+  webui_admin_password:
+    file: ./secrets/webui_admin_password
   wireguard_private_key:
     file: ./secrets/wireguard_private_key

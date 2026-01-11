@@ -409,7 +409,7 @@ fi
 # Check for secrets
 echo "✓ Checking secrets exist..."
 required_secrets=(
-    "secrets/cloudflare_token.txt"
+    "secrets/cloudflare_token"
     "secrets/vpn_private_key.txt"
     "secrets/grafana_password.txt"
 )

@@ -59,12 +59,13 @@ services:
       - ./grafana/config/datasources:/etc/grafana/provisioning/datasources
       - ./grafana/config/dashboards:/etc/grafana/provisioning/dashboards
       - ./grafana/dashboards:/var/lib/grafana/dashboards
-      - ./grafana/secrets:/run/secrets:ro
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/admin_password
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_admin_password
+    secrets:
+      - grafana_admin_password
     deploy:
       resources:
         limits:
