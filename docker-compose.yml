@@ -11,9 +11,8 @@ include:
   - servarr/docker-compose.yml
   - traefik/docker-compose.yml
   - web-ui/docker-compose.yml
-  - networks.yml  # Iteration 1: Segmented network architecture
+  - networks.yml
 
-# Iteration 5: File-based secrets
 secrets:
   cloudflare_token:
     file: ./secrets/cloudflare_token
