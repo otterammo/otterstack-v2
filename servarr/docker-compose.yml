@@ -3,6 +3,9 @@ services:
     image: linuxserver/sonarr:latest
     container_name: sonarr
     restart: unless-stopped
+    depends_on:
+      qbittorrent:
+        condition: service_healthy
     volumes:
       - ./sonarr/config:/config
       - ${TV_PATH:-/mnt/external/tv}:/tv
@@ -39,6 +42,9 @@ services:
     image: linuxserver/radarr:latest
     container_name: radarr
     restart: unless-stopped
+    depends_on:
+      qbittorrent:
+        condition: service_healthy
     volumes:
       - ./radarr/config:/config
       - ${MOVIES_PATH:-/mnt/external/movies}:/movies

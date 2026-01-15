@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
     network_mode: "service:gluetun"
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
     volumes:
       - ./qbittorrent/config:/config
       - ${DOWNLOADS_PATH:-/mnt/external/downloads}:/downloads
@@ -22,6 +23,14 @@ services:
           memory: 4G
         reservations:
           memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    labels:
+      - "autoheal=true"
 
   gluetun:
     image: qmcgaw/gluetun:latest
