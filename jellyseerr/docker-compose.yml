@@ -18,6 +18,7 @@ services:
     networks:
       - frontend-net
       - backend-net
+      - dmz-net
     depends_on:
       - jellyfin
     healthcheck:
