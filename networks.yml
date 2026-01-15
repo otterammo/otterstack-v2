@@ -24,10 +24,10 @@ networks:
 
   # Backend - Business logic and automation services
   # Services: Sonarr, Radarr, Prowlarr, Bazarr, Jellyseerr (API access)
+  # Note: Not fully internal to allow external API access (TMDb, GitHub, indexers)
   backend-net:
     name: backend-net
     driver: bridge
-    internal: true
     ipam:
       driver: default
       config:
@@ -47,10 +47,10 @@ networks:
 
   # Management - Infrastructure and monitoring services
   # Services: Prometheus, Grafana, cAdvisor, Node Exporter, Alertmanager, Dozzle, Autoheal
+  # Note: Not fully internal to allow Alertmanager Discord webhooks and metric scraping
   mgmt-net:
     name: mgmt-net
     driver: bridge
-    internal: true
     ipam:
       driver: default
       config:
