@@ -18,6 +18,7 @@ services:
       - "--entrypoints.radarr.address=:7878"
       - "--entrypoints.prowlarr.address=:9696"
       - "--entrypoints.bazarr.address=:6767"
+      - "--entrypoints.flaresolverr.address=:8191"
       - "--entrypoints.qbittorrent.address=:8080"
       - "--entrypoints.grafana.address=:3000"
       - "--entrypoints.prometheus.address=:9090"
@@ -49,6 +50,7 @@ services:
       - "7878:7878"   # Radarr
       - "9696:9696"   # Prowlarr
       - "6767:6767"   # Bazarr
+      - "8191:8191"   # FlareSolverr
       - "8080:8080"   # qBittorrent
       - "3000:3000"   # Grafana
       - "9090:9090"   # Prometheus
