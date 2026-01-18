@@ -5,6 +5,7 @@ backups/
 cache/
 config/
 data/
+logs/
 node_modules/
 redis-data/
 
