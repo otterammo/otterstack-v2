@@ -21,7 +21,7 @@ services:
       # Docker socket for container stop/start during backup
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Backup destination
-      - ${BACKUP_DESTINATION:-/mnt/backups}:/archive
+      - ${BACKUP_DESTINATION:-/mnt/external/backups}:/archive
     environment:
       - TZ=${TZ:-UTC}
       - BACKUP_CRON_EXPRESSION=${BACKUP_CRON:-0 2 * * *}
