@@ -30,5 +30,4 @@ services:
       - "traefik.http.routers.dozzle.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.dozzle.entrypoints=dozzle"
       - "traefik.http.routers.dozzle.tls=true"
-      - "traefik.http.routers.dozzle.middlewares=authelia@docker"
       - "traefik.http.services.dozzle.loadbalancer.server.port=8080"

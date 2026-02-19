@@ -41,5 +41,4 @@ services:
       - "traefik.http.routers.web-ui.rule=Host(`${TAILSCALE_HOST}`)"
       - "traefik.http.routers.web-ui.entrypoints=web-ui"
       - "traefik.http.routers.web-ui.tls=true"
-      - "traefik.http.routers.web-ui.middlewares=authelia@docker"
       - "traefik.http.services.web-ui.loadbalancer.server.port=3000"

@@ -320,7 +320,7 @@ The private key displayed in the Mullvad web console is **different** from the a
 
 ## Auto-Healing
 
-The compose stack deploys a small [autoheal](https://hub.docker.com/r/willfarrell/autoheal) helper that watches Gluetun's Docker healthcheck. When Gluetun reports itself as `unhealthy`, autoheal issues a `docker restart gluetun`, which also bounces qBittorrent because it shares Gluetun's network namespace.
+The compose stack deploys a small [autoheal](https://hub.docker.com/r/willfarrell/autoheal) helper that watches containers labeled `autoheal=true`. Both Gluetun and qBittorrent are labeled. qBittorrent's healthcheck validates both `127.0.0.1:8080` (WebUI) and `127.0.0.1:9999` (Gluetun health endpoint), so namespace or VPN-path failures can trigger an automatic qBittorrent restart.
 
 Useful commands:
 
@@ -329,11 +329,12 @@ Useful commands:
 docker ps | grep autoheal
 docker logs autoheal --tail=20
 
-# Confirm Gluetun health flag
+# Confirm Gluetun/qBittorrent health flags
 docker inspect --format '{{.State.Health.Status}}' gluetun
+docker inspect --format '{{.State.Health.Status}}' qbittorrent
 ```
 
-If you ever need to disable auto-healing, remove the `autoheal` service and the `autoheal=true` label from Gluetun in `qbittorrent/docker-compose.yml`.
+If you ever need to disable auto-healing, remove the `autoheal` service and `autoheal=true` labels in `qbittorrent/docker-compose.yml`.
 
 ## Rolling Back
 

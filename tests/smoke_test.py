@@ -48,10 +48,6 @@ SERVICES = [
     {'name': 'Traefik', 'container': 'traefik', 'port': 80, 'path': '/ping', 'critical': True},
     {'name': 'Dozzle', 'container': 'dozzle', 'native_healthcheck': True, 'critical': False},
 
-    # Security & Authentication
-    {'name': 'Authelia', 'container': 'authelia', 'port': 9091, 'path': '/api/health', 'critical': True},
-    {'name': 'Redis', 'container': 'authelia-redis', 'redis_check': True, 'critical': True},
-
     # Monitoring
     {'name': 'Grafana', 'container': 'grafana', 'port': 3000, 'path': '/api/health', 'critical': False},
     {'name': 'Prometheus', 'container': 'prometheus', 'port': 9090, 'path': '/-/healthy', 'critical': True},
@@ -62,8 +58,6 @@ SERVICES = [
 # Critical Docker containers that must be running
 CRITICAL_CONTAINERS = [
     'traefik',
-    'authelia',
-    'authelia-redis',
     'jellyfin',
     'sonarr',
     'radarr',

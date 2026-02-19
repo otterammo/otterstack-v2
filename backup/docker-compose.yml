@@ -16,8 +16,6 @@ services:
       - ../monitoring/grafana/data:/backup/grafana-data:ro
       - ../monitoring/loki/data:/backup/loki-data:ro
       - ../traefik/config:/backup/traefik-config:ro
-      - ../authelia/config:/backup/authelia-config:ro
-      - ../authelia/data:/backup/authelia-data:ro
       # Docker socket for container stop/start during backup
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Backup destination
@@ -26,7 +24,7 @@ services:
       - TZ=${TZ:-UTC}
       - BACKUP_CRON_EXPRESSION=${BACKUP_CRON:-0 2 * * *}
       - BACKUP_FILENAME=media-server-backup-%Y%m%d-%H%M%S.tar.gz
-      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-7}
       - BACKUP_PRUNING_LEEWAY=1m
       - BACKUP_COMPRESSION=gz
     deploy:
