@@ -88,9 +88,10 @@ services:
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
     container_name: cadvisor
     restart: unless-stopped
+    user: "65534:65534"
     ports:
       - "8888:8080"
     volumes:
