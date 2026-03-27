@@ -10,10 +10,16 @@ services:
       - ${MOVIES_PATH:-/mnt/external/movies}:/media/movies:ro
       - ${TV_PATH:-/mnt/external/tv}:/media/tv:ro
       - ${MUSIC_PATH:-/mnt/external/music}:/media/music:ro
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "44"
+      - "993"
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
       - JELLYFIN_PublishedServerUrl=https://${TAILSCALE_HOST}:8096
     deploy:
       resources:
