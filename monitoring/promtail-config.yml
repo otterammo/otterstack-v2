@@ -6,7 +6,8 @@ positions:
   filename: /tmp/positions.yaml
 
 clients:
-  - url: http://loki:3100/loki/api/v1/push
+  - url: http://172.20.4.1:3100/loki/api/v1/push
+    # Sending to K8s Loki via port-forward on Docker host (172.20.4.1 is the mgmt-net gateway)
 
 scrape_configs:
   # Docker container logs
